@@ -80,6 +80,9 @@ func (m *Model) todaySmall(s *screen, x0, y0, w int) {
 	if sec := b.nf.second(b.r.Today.Cost); sec != "" {
 		s.put(L, y0+3, trunc(sec, w-4), sMu)
 	}
+	if b.r.Today.Incomplete {
+		s.put(L, y0+4, trunc("may be low", w-4), sWa)
+	}
 	var top *row
 	for i := range b.rows {
 		if top == nil || b.rows[i].todayWh > top.todayWh {
@@ -113,7 +116,7 @@ func (m *Model) billSmall(s *screen, x0, y0, w int) {
 		s.put(L, y0+3, trunc(sec+" so far", w-4), sMu)
 	}
 	s.put(L, y0+4, trunc(b.nf.kwh1(b.r.Bill.Wh)+" kWh · "+daysLeft(b), w-4), sMu)
-	if b.partial() {
+	if b.billLow() {
 		s.put(L, y0+5, trunc("projection may be low", w-4), sWa)
 	} else {
 		s.put(L, y0+5, trunc("projected, not billed", w-4), sMu)
@@ -160,7 +163,7 @@ func (m *Model) itemsNarrow(s *screen, y0, h int) {
 		s.put(5, y, trunc(rw.it.Name, 11), sTx.bold())
 		s.put(17, y, string(rw.it.Mode), st{fg: modeRole(rw.it.Mode)})
 		rst := sMu
-		if rw.state == stateOffline {
+		if rw.state == stateOffline || rw.state == stateUnknown {
 			rst = sWa
 		}
 		s.put(srcX, y, trunc(b.rule(rw), srcW), rst)

@@ -8,6 +8,7 @@ import (
 
 	"github.com/kevnnard/watts/internal/config"
 	"github.com/kevnnard/watts/internal/energy"
+	"github.com/kevnnard/watts/internal/store"
 )
 
 // itemState is how an item reads right now.
@@ -18,6 +19,7 @@ const (
 	stateOn
 	stateOffline
 	statePending // in the config but not in the report yet (just added)
+	stateUnknown // a network item without a fresh known state: not off, not 0 W
 )
 
 // row is one item, joined from the config, the report and the sources.
@@ -27,6 +29,8 @@ type row struct {
 	watts     float64
 	est       bool                 // estimated (follows, schedule, manual), not measured
 	disp      *energy.DisplayState // fresh DDC reading driving the watts (S19)
+	net       *energy.NetworkState // fresh network reading (S20)
+	lastTS    time.Time            // network: newest reading, zero if none
 	src       *Source
 	todayWh   float64
 	todayCost float64
@@ -50,6 +54,7 @@ type board struct {
 	measuredW  float64
 	estimatedW float64
 	offline    []string  // names of offline items
+	unknown    []string  // names of network items without a known state now
 	offSince   time.Time // newest sample of the offline sources
 	dayIdx     int       // 1-based day of the billing period
 	days       int
@@ -80,9 +85,13 @@ func newBoard(cfg *config.Config, r energy.Report, sources []Source, tr Trend, h
 			rw.src = b.source(it.Source)
 		}
 		n, ok := now[it.Name]
+		rw.net, rw.lastTS = n.Network, n.LastTS
 		switch {
 		case !ok:
 			rw.state = statePending
+		case it.Mode == config.ModeNetwork && n.Offline:
+			rw.state = stateUnknown
+			b.unknown = append(b.unknown, it.Name)
 		case n.Offline || (rw.src != nil && !rw.src.Online):
 			rw.state = stateOffline
 			b.offline = append(b.offline, it.Name)
@@ -93,7 +102,9 @@ func newBoard(cfg *config.Config, r energy.Report, sources []Source, tr Trend, h
 			}
 		case n.On:
 			rw.state, rw.watts, rw.disp = stateOn, n.Watts, n.Display
-			b.onCount++
+			if !rw.standby() {
+				b.onCount++
+			}
 			if rw.est {
 				b.estimatedW += n.Watts
 			} else {
@@ -147,16 +158,84 @@ func (b *board) source(name string) *Source {
 	return nil
 }
 
-// partial reports whether a measured item is offline, so totals are low.
-func (b *board) partial() bool { return len(b.offline) > 0 }
+// partial reports whether a measured item is offline or a network item's
+// state is unknown, so the watts now are low.
+func (b *board) partial() bool { return len(b.offline)+len(b.unknown) > 0 }
 
 func (b *board) offlineNames() string { return orList(b.offline) }
 
-// wattsText is the Now column: "70,9 W", "~25,0 W", "0 W" or "offline".
+// nowNote names what partial leaves out: "PC Linux offline, PS5 unknown".
+func (b *board) nowNote() string {
+	var parts []string
+	if len(b.offline) > 0 {
+		parts = append(parts, orList(b.offline)+" offline")
+	}
+	if len(b.unknown) > 0 {
+		parts = append(parts, orList(b.unknown)+" unknown")
+	}
+	return strings.Join(parts, ", ")
+}
+
+// unknownTime lists the items with unknown time in t: "PS5 unknown 3 h
+// 10 min". Their totals count none of it, so t is a lower bound.
+func unknownTime(t energy.Totals, sep string) string {
+	var parts []string
+	for _, x := range t.Items {
+		if x.UnknownSeconds > 0 {
+			parts = append(parts, x.Name+sep+duration(x.UnknownSeconds))
+		}
+	}
+	return strings.Join(parts, ", ")
+}
+
+// billLow reports whether the bill so far, and its projection, may be low:
+// a measured item is offline or a network item has unknown time.
+func (b *board) billLow() bool { return len(b.offline) > 0 || b.r.Bill.Incomplete }
+
+// billLowNote is why billLow: "PC Linux missing, PS5 unknown 3 h 10 min".
+func (b *board) billLowNote() string {
+	var parts []string
+	if len(b.offline) > 0 {
+		parts = append(parts, orList(b.offline)+" missing")
+	}
+	if u := unknownTime(b.r.Bill, " unknown "); u != "" {
+		parts = append(parts, u)
+	}
+	return strings.Join(parts, ", ")
+}
+
+// duration is "45 min", "3 h 10 min" or "2 d 4 h", rounded to the minute.
+func duration(sec float64) string {
+	mins := int(math.Round(sec / 60))
+	switch {
+	case mins < 1:
+		return "< 1 min"
+	case mins < 60:
+		return itoa(mins) + " min"
+	case mins < 24*60:
+		if mins%60 == 0 {
+			return itoa(mins/60) + " h"
+		}
+		return itoa(mins/60) + " h " + itoa(mins%60) + " min"
+	}
+	h := int(math.Round(float64(mins) / 60))
+	if h%24 == 0 {
+		return itoa(h/24) + " d"
+	}
+	return itoa(h/24) + " d " + itoa(h%24) + " h"
+}
+
+// standby reports a network item whose fresh reading says standby.
+func (rw row) standby() bool { return rw.net != nil && rw.net.State == store.NetworkStandby }
+
+// wattsText is the Now column: "70,9 W", "~25,0 W", "0 W", "offline" or
+// "unknown".
 func (b *board) wattsText(rw row) (string, st) {
 	switch rw.state {
 	case stateOffline:
 		return "offline", sEr
+	case stateUnknown:
+		return "unknown", sWa
 	case statePending:
 		return "…", sMu
 	case stateOff:
@@ -168,13 +247,17 @@ func (b *board) wattsText(rw row) (string, st) {
 	return b.nf.watts(rw.watts), sTx.bold()
 }
 
-// glyph is ● on (mode color), ○ off, ✗ offline.
+// glyph is ● on (mode color), ◐ standby, ○ off, ✗ offline, ? unknown.
 func glyph(rw row) (string, st) {
-	switch rw.state {
-	case stateOn:
+	switch {
+	case rw.state == stateOn && rw.standby():
+		return "◐", sT2
+	case rw.state == stateOn:
 		return "●", st{fg: modeRole(rw.it.Mode)}
-	case stateOffline:
+	case rw.state == stateOffline:
 		return "✗", sEr
+	case rw.state == stateUnknown:
+		return "?", sWa
 	}
 	return "○", sMu
 }
@@ -189,6 +272,8 @@ func modeRole(m config.Mode) role {
 		return sc
 	case config.ModeManual:
 		return mn
+	case config.ModeNetwork:
+		return t2
 	}
 	return mu
 }
@@ -223,6 +308,12 @@ func (b *board) rule(rw row) string {
 		}
 		parts = append(parts, b.nf.typical(it.Watts))
 		return strings.Join(parts, " ") + " · " + rangeText(it.Schedule)
+	case config.ModeNetwork:
+		host := it.Host
+		if rw.net != nil && rw.net.Host != "" {
+			host = rw.net.Host
+		}
+		return it.Source + " · " + netNote(rw) + " · " + host
 	case config.ModeManual:
 		verb := "off"
 		next := "space turns on"
@@ -252,6 +343,21 @@ func ddcNote(rw row) string {
 		pct = int(math.Round(100 * float64(d.Brightness) / float64(d.Max)))
 	}
 	return "brightness " + itoa(pct) + " % · DDC via " + d.Source
+}
+
+// netNote is a network item's state now: "on", "standby", "state unknown
+// at 20:14", "no reading since 18:40" or "no readings yet". On is the
+// device's power state, not proof it is in use.
+func netNote(rw row) string {
+	switch {
+	case rw.state == stateOn && rw.net != nil:
+		return rw.net.State
+	case rw.net != nil:
+		return "state unknown at " + clock(rw.net.TS)
+	case !rw.lastTS.IsZero():
+		return "no reading since " + clock(rw.lastTS)
+	}
+	return "no readings yet"
 }
 
 func clock(t time.Time) string { return t.Format("15:04") }

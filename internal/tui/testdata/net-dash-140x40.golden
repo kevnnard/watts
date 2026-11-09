@@ -1,0 +1,40 @@
+ watts   Enel · $990,53 per kWh                                                                                            Sun Nov 8  20:15 
+┌─ Now ────────────────────────────────────────────────────────┐┌─ Today ──────────────────────────┐┌─ Bill ───────────────── day 8 of 30 ─┐
+│ Total  133,3 W  partial · PS5 unknown        4 of 7 items on ││ 1,83 kWh                  $1.814 ││ $11.876 so far             ≈ US$2.97 │
+│ 80,8 W measured  +  ~52,5 W estimated                        ││ 00:00 → 20:15          ≈ US$0.45 ││ projected $29.100          ≈ US$7.28 │
+│                                                              ││ may be low: PS5 unknown          ││ may be low: PS5 unknown 3 h 10 min   │
+│ ██████████████████████████████ ████ ▓▓▓▓▓▓▓▓▓▓▓ ▓▓▓▓▓▓▓▓▓▓▓  ││ By hour                      kWh ││ ████████████░░░░░░░░░░░░░░░░░░  41 % │
+│ PC Linux                       Mac  LG 29WQ600  Room lights  ││           ▁   ▁▁  ▁▁     0,15    ││ 12,0 kWh used · 22 days left         │
+│                                                              ││           █   ██  ██             ││                                      │
+│ Last 3 h                 avg 120,8 W · peak 138,5 W at 20:14 ││           █▅▅ ██▅▅██             ││ Per day                          kWh │
+│                ▂▃▃▃▃▄▄▄▄▄▄▄▃▂▂▂▁▁▁▁▂▂▂▃▃▃▄▄▄▄▄▄▃▃▃▃▃▃▃▃▄▄▅▅▅ ││          ▆███ ██████             ││ ▂▄ ▄▅▂▅▇                       1,5   │
+│ ▅▅▆▆▇▇▆▆▆▆▅▅▅▅▅█████████████████████████████████████████████ ││          ████ ██████             ││ ████████                             │
+│ ████████████████████████████████████████████████████████████ ││          ████▃██████▇            ││ ████████······················ 0     │
+│ ████████████████████████████████████████████████████████████ ││          ████████████··· 0       ││ Nov 1  ▲ today           Dec 1       │
+│ 17:15          18:00               19:00                 now ││ 00    06    12    18             ││ avg 1,20 kWh per full day            │
+└──────────────────────────────────────────────────────────────┘└──────────────────────────────────┘└──────────────────────────────────────┘
+┌─ Items ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 7 ─┐
+│     Item             Mode      Source or rule                           Now  Last 3 h                       Today kWh      Cost    Share │
+│ ▸ ● PC Linux         measured  linux · ssh kevnnard-station          70,9 W  ▅▅▆▆▅▅▅▅▅▅▆▆▆▅▅▅▄▅▅▅▅▆▆▅▅▅▅▅▆▆      0,78      $772     43 % │
+│     ├ CPU            measured  RAPL energy counter                   13,8 W  ▅▆▆▅▅▄▅▅▆▆▆▅▄▅▅▆▆▆▅▅▄▅▅▆▆▅▅▄▅▅                              │
+│     ├ GPU            measured  hwmon power1_average                  11,5 W  ▅▅▅▅▅▅▅▄▄▄▄▄▄▄▅▅▅▅▅▅▄▄▄▄▄▄▄▄▅▅                              │
+│     └ rest           estimate  fixed 35 W, PSU at 85 % adds 10,6 W  ~35,0 W                                                              │
+│   ● Mac              measured  mac · this machine                     9,9 W  ▅▆▅▅▅▅▆▅▅▅▅▆▅▅▅▅▆▆▅▅▅▅▆▅▅▅▅▆▅▅      0,14      $139      8 % │
+│   ● LG 29WQ600       follows   on while Mac or PC Linux is on       ~25,0 W  ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇      0,31      $307     17 % │
+│   ● Room lights      schedule  3 × LED bulb 9 W · 18:00–24:00       ~27,0 W         ▃▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅      0,06       $59      3 % │
+│   ○ Desk fan         manual    off since 15:50 · space turns on         0 W  off                                 0,13      $129      7 % │
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+┌─ Period by item ─────────────────────────────────── Nov 1 → today ─┐┌─ Sources ──────────────────────────────────────────────────────────┐
+│ Item                                          kWh     Cost  Share  ││ Machine  Status      Reads                             Last sample │
+│ PC Linux     ██████████████████████████████   5,4   $5.349   45 %  ││ mac      ● online    ioreg SystemPowerIn (charger)        20:15:02 │
+│ LG 29WQ600   ▓▓▓▓▓▓▓▓▓▓▓▓                     2,1   $2.080   18 %  ││ linux    ● online    ssh kevnnard-station, RAPL + GPU …   20:14:58 │
+│ PS5          ▓▓▓▓▓▓▓▓▓▓▓▓                     2,1   $2.080   18 %  ││                                                                    │
+│ Mac          ██████                           1,0     $991    8 %  ││ watts daemon samples every 60 s on each machine.                   │
+│ + 3 more · b shows the whole bill                                  ││ A Mac on battery records 0 W; that energy counts                   │
+│                                                                    ││ when it charges.                                                   │
+│ Measured 6,4 kWh   Estimated ~5,6 kWh                              ││                                                                    │
+│                                                                    ││                                                                    │
+│ Estimated = watts × time on by its rule. Editing a rule            ││ W measured   ~W estimated   ● on  ○ off  ✗ offline                 │
+│ recomputes past days too.                                          ││                                                                    │
+└────────────────────────────────────────────────────────────────────┘└────────────────────────────────────────────────────────────────────┘
+ a add  e edit  d delete  space toggle  t tariffs  c currency  b bill  q quit  n network                                   updated 20:15:05 

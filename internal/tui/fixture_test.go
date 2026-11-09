@@ -176,6 +176,7 @@ func fixDDCReport(on bool) energy.Report {
 type fakeData struct {
 	offline bool
 	ddc     bool // the LG has a fresh DDC reading (fixDDCReport)
+	net     bool // fixNetReport: a TV in standby and a PS5 with no fresh reading
 	err     error
 	calls   int
 }
@@ -193,6 +194,9 @@ func (f *fakeData) RefreshTrend(_ context.Context, cfg *config.Config, _ tariff.
 	r := fixReport(f.offline)
 	if f.ddc {
 		r = fixDDCReport(true)
+	}
+	if f.net {
+		r = fixNetReport()
 	}
 	return r, fixSources(f.offline), fixTrend(f.offline), nil
 }

@@ -1,0 +1,40 @@
+ watts   Enel · $990,53 per kWh                                                                                            Sun Nov 8  20:15 
+┌─ Network devices ────────────────────────────────────────────────────────────────────────────────────────────── 5 found · scanned 20:15 ─┐
+│ en0 192.0.2.10/24 · samsung, ddp, ssdp, mdns · multicast may not reach other subnets                                                     │
+│                                                                                                                                          │
+│   Device                 Kind      Brand · model             Address       State       Found by      Counts as             In items      │
+│ ──────────────────┌─ Add item ────────────────────────────────────────────────────────────────── step 2 of 3 · mode ─┐────────────────── │
+│   Samsung TV      │ 1 Device  ›  2 Mode  ›  3 Name and quantity                                                      │e                  │
+│   PS5             │                                                                                                  │e    ✓ PS5         │
+│ ▸ Router          │ How does it count?                                             │ Modes                           │e                  │
+│   Living room spea│                                                                │                                 │e                  │
+│   unnamed device  │ ▸ Mode       ‹ manual             ›                            │   schedule  on at set hours     │e                  │
+│ ──────────────────│                                                                │ ▸ manual    on when toggled     │────────────────── │
+│ Router   router · │                                                                │                                 │                   │
+│ ID         uuid:0b│                                                                │                                 │                   │
+│ State      ? unkno│                                                                │                                 │                   │
+│ Counts as  manual │ Fixed watts while you toggle it                                │ network and measured need a     │                   │
+│ Watts      not kno│ on with space in the items list.                               │ state query or a sensor; this   │                   │
+│                   │                                                                │ device has neither, so you      │                   │
+│                   │                                                                │ enter watts and when it is on.  │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   └──────────────────────────────────────────────────────────────────────────────────────────────────┘                   │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+ ←→ change  tab next field  enter continue  esc back                                                                                        

@@ -37,4 +37,4 @@
 │ Estimated = watts × time on by its rule. Editing a rule            ││ W measured   ~W estimated   ● on  ○ off  ✗ offline                 │
 │ recomputes past days too.                                          ││                                                                    │
 └────────────────────────────────────────────────────────────────────┘└────────────────────────────────────────────────────────────────────┘
- a add  e edit  d delete  space toggle  t tariffs  c currency  b bill  q quit                                              updated 20:15:05 
+ a add  e edit  d delete  space toggle  t tariffs  c currency  b bill  q quit  n network                                   updated 20:15:05 

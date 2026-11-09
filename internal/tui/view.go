@@ -13,7 +13,7 @@ import (
 // key is one key hint in the key bar.
 type key struct{ k, label string }
 
-var dashKeys = []key{{"a", "add"}, {"e", "edit"}, {"d", "delete"}, {"space", "toggle"}, {"t", "tariffs"}, {"c", "currency"}, {"b", "bill"}, {"q", "quit"}}
+var dashKeys = []key{{"a", "add"}, {"e", "edit"}, {"d", "delete"}, {"space", "toggle"}, {"t", "tariffs"}, {"c", "currency"}, {"b", "bill"}, {"q", "quit"}, {"n", "network"}}
 
 func (m *Model) size() (int, int) {
 	w, h := m.w, m.h
@@ -39,6 +39,11 @@ func (m *Model) draw() *screen {
 	}
 	if m.modal != nil {
 		s.shade()
+		if f, ok := m.modal.(*itemForm); ok && f.back != nil {
+			// adding from the network view: the form sits on the view
+			f.back.draw(m, s)
+			s.shade()
+		}
 		m.modal.draw(m, s)
 		keybar(s, s.h-1, m.modal.keys(m), "", false)
 	}
@@ -158,7 +163,7 @@ func (m *Model) nowPanel(s *screen, x0, y0, w int) {
 	countText := itoa(b.onCount) + " of " + itoa(len(b.rows)) + " items on"
 	x := s.seq(L, y0+1, []seg{{"Total  ", sMu}, {b.nf.watts(b.r.TotalWatts), sTx.bold()}})
 	if b.partial() {
-		s.seqMax(x+2, y0+1, R-textWidth(countText)-2-(x+2), []seg{{"partial · " + b.offlineNames() + " offline", sWa}})
+		s.seqMax(x+2, y0+1, R-textWidth(countText)-2-(x+2), []seg{{"partial · " + b.nowNote(), sWa}})
 	}
 	s.rput(R, y0+1, countText, sMu)
 	s.seqMax(L, y0+2, w-4, []seg{{b.nf.watts(b.measuredW), sTx.bold()}, {" measured", sMu}, {"  +  ", sMu}, {"~" + b.nf.watts(b.estimatedW), sT2.italic()}, {" estimated", sMu}})
@@ -210,7 +215,7 @@ func (m *Model) nowPanel(s *screen, x0, y0, w int) {
 			pk, at = v, i
 		}
 	}
-	if b.partial() && !b.offSince.IsZero() {
+	if len(b.offline) > 0 && !b.offSince.IsZero() {
 		s.rput(R, y0+7, trunc("amber: after "+clock(b.offSince)+", without "+b.offlineNames(), inner-10), sWa)
 	} else if n > 0 {
 		s.rput(R, y0+7, "avg "+b.nf.watts(sum/float64(n))+" · peak "+b.nf.watts(pk)+" at "+clock(b.trend.Start.Add(time.Duration(at)*time.Minute)), sMu)
@@ -254,6 +259,13 @@ func (m *Model) todayPanel(s *screen, x0, y0 int) {
 	s.put(L, y0+2, "00:00 → "+clock(b.r.At), sMu)
 	if sec := b.nf.second(b.r.Today.Cost); sec != "" {
 		s.rput(R, y0+2, sec, sMu)
+	}
+	if u := unknownTime(b.r.Today, " unknown "); u != "" {
+		low := "may be low: " + u
+		if textWidth(low) > 32 {
+			low = "may be low: " + orList(b.unknown) + " unknown"
+		}
+		s.put(L, y0+3, trunc(low, 32), sWa)
 	}
 	s.put(L, y0+4, "By hour", sMu)
 	s.rput(R, y0+4, "kWh", sMu)
@@ -306,8 +318,8 @@ func (m *Model) billPanel(s *screen, x0, y0 int) {
 	if sec := b.nf.second(b.r.Projected.Cost); sec != "" {
 		s.rput(R, y0+2, sec, sMu)
 	}
-	if b.partial() {
-		s.put(L, y0+3, trunc("may be low: "+b.offlineNames()+" missing", 36), sWa)
+	if b.billLow() {
+		s.put(L, y0+3, trunc("may be low: "+b.billLowNote(), 36), sWa)
 	}
 	filled := int(math.Round(b.billPct * 30))
 	s.put(L, y0+4, strings.Repeat("█", filled), sAc)
@@ -515,7 +527,7 @@ func (m *Model) itemsFull(s *screen, y0, h int) {
 		s.put(6, y, trunc(rw.it.Name, 16), sTx.bold())
 		s.put(23, y, string(rw.it.Mode), st{fg: modeRole(rw.it.Mode)})
 		rst := sMu
-		if rw.state == stateOffline {
+		if rw.state == stateOffline || rw.state == stateUnknown {
 			rst = sWa
 		}
 		s.put(srcX, y, trunc(b.rule(rw), srcW), rst)

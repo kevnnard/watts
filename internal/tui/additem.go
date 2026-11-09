@@ -1,6 +1,7 @@
 package tui
 
 import (
+	"slices"
 	"strconv"
 	"strings"
 
@@ -34,9 +35,25 @@ var modeHelp = []struct {
 	{config.ModeManual, "on when toggled", []string{"Fixed watts while you toggle it", "on with space in the items list."}},
 }
 
+// networkHelp is the network mode's line in the mode lists (S20). It is
+// offered only for a network item or a found device with a state query.
+var networkHelp = struct {
+	mode config.Mode
+	desc string
+	long []string
+}{config.ModeNetwork, "reported on/standby", []string{"Watts while the device reports on,", "standby watts in standby, shown", "with ~. When it does not answer,", "the state is unknown: that time", "is not counted as off, nor filled in."}}
+
+// baseModes are the choices of a or e on a device without a state query.
+var baseModes = []string{"measured", "follows", "schedule", "manual"}
+
 type itemForm struct {
 	editing string // name of the edited item, "" when adding
 	step    addStep
+
+	// from the Network devices view (n): the found device, and the view
+	// esc returns to from step 1
+	net  *netDev
+	back modal
 
 	// step 1, catalog
 	query   input
@@ -70,6 +87,9 @@ const (
 	fSource
 	fFollows
 	fHours
+	fProbe // network
+	fHost  // network
+	fID    // network
 )
 
 // name form fields
@@ -77,6 +97,7 @@ const (
 	nName = iota
 	nWatts
 	nQty
+	nStandby // network
 )
 
 func newAddForm(m *Model) *itemForm {
@@ -103,6 +124,9 @@ func newEditForm(m *Model, it config.Item) *itemForm {
 		q = 1
 	}
 	f.name.fields[nQty].value = itoa(q)
+	if it.Mode == config.ModeNetwork {
+		f.name.fields[nStandby].value = m.b.nf.short(it.StandbyW)
+	}
 	f.syncMode()
 	return f
 }
@@ -125,17 +149,32 @@ func (f *itemForm) initMode(m *Model, it config.Item) {
 	src := it.Source
 	if src == "" {
 		src = config.SourceMac
+		if it.Mode == config.ModeNetwork {
+			src = m.local
+		}
+	}
+	modes := baseModes
+	if it.Mode == config.ModeNetwork {
+		modes = append([]string{string(config.ModeNetwork)}, baseModes...)
+	}
+	probe := it.Probe
+	if probe == "" {
+		probe = config.ProbeSamsung
 	}
 	f.mode = form{fields: []*input{
-		{label: "Mode", value: string(it.Mode), choices: []string{"measured", "follows", "schedule", "manual"}},
+		{label: "Mode", value: string(it.Mode), choices: modes},
 		{label: "Source", value: src, choices: []string{config.SourceMac, config.SourceLinux}},
 		{label: "Follows", value: follows, note: " names, comma separated"},
 		{label: "Hours", value: hours, note: " HH:MM-HH:MM, comma separated"},
+		{label: "Probe", value: probe, choices: []string{config.ProbeSamsung, config.ProbePS5}},
+		{label: "Host", value: it.Host, note: " IPv4 address"},
+		{label: "ID", value: it.ID, placeholder: "none", note: " optional · uuid:, mac: or ps:"},
 	}}
 	f.name = form{fields: []*input{
 		{label: "Name"},
-		{label: "Watts", note: " W per unit"},
+		{label: "Watts", note: " W per unit, on"},
 		{label: "Quantity", value: "1"},
+		{label: "Standby", note: " W per unit, 0 or more"},
 	}}
 	f.syncMode()
 }
@@ -143,11 +182,20 @@ func (f *itemForm) initMode(m *Model, it config.Item) {
 // syncMode hides the fields the chosen mode does not use.
 func (f *itemForm) syncMode() {
 	md := config.Mode(f.mode.fields[fMode].value)
-	f.mode.fields[fSource].hidden = md != config.ModeMeasured
+	net := md == config.ModeNetwork
+	f.mode.fields[fSource].hidden = md != config.ModeMeasured && !net
 	f.mode.fields[fFollows].hidden = md != config.ModeFollows
 	f.mode.fields[fHours].hidden = md != config.ModeSchedule
+	f.mode.fields[fProbe].hidden = !net
+	f.mode.fields[fHost].hidden = !net
+	f.mode.fields[fID].hidden = !net
+	f.mode.fields[fSource].note = ""
+	if net {
+		f.mode.fields[fSource].note = " the machine that asks it"
+	}
 	f.name.fields[nWatts].hidden = md == config.ModeMeasured
 	f.name.fields[nQty].hidden = md == config.ModeMeasured
+	f.name.fields[nStandby].hidden = !net
 }
 
 func (f *itemForm) search() {
@@ -201,6 +249,10 @@ func (f *itemForm) key(m *Model, k tea.KeyPressMsg) tea.Cmd {
 	case stepLabel:
 		switch ks {
 		case "esc":
+			if f.back != nil {
+				m.modal = f.back
+				return nil
+			}
 			f.step = stepCatalog
 		case "enter":
 			w, ok := parseNumber(f.label.fields[lWatts].value)
@@ -270,9 +322,19 @@ func (f *itemForm) pick(m *Model, e *catalog.Entry) {
 	case catalog.KindBulb:
 		md = config.ModeSchedule
 	}
+	if f.net != nil {
+		// a found device counts by its state only when it can be asked
+		md = config.ModeManual
+		if f.net.d.Probe != "" {
+			md = config.ModeNetwork
+		}
+	}
 	f.mode.fields[fMode].value = string(md)
 	f.mode.focus = fMode
 	name := strings.TrimSpace(brand + " " + model)
+	if f.net != nil && f.net.d.Name != "" {
+		name = f.net.d.Name
+	}
 	if name == "" {
 		name = strings.ToUpper(kind[:min(1, len(kind))]) + kind[min(1, len(kind)):]
 	}
@@ -284,7 +346,10 @@ func (f *itemForm) pick(m *Model, e *catalog.Entry) {
 	f.step = stepMode
 }
 
-const qtyErr = "quantity must be a whole number of at least 1"
+const (
+	qtyErr     = "quantity must be a whole number of at least 1"
+	standbyErr = "standby watts must be a number, 0 or more"
+)
 
 func parseQty(s string) (int, bool) {
 	n, err := strconv.Atoi(strings.TrimSpace(s))
@@ -355,6 +420,18 @@ func (f *itemForm) item(m *Model) (config.Item, string) {
 		it.Follows = splitList(mf[fFollows].value)
 	case config.ModeSchedule:
 		it.Schedule = splitList(mf[fHours].value)
+	case config.ModeNetwork:
+		it.Source, it.Probe, it.Host = mf[fSource].value, mf[fProbe].value, strings.TrimSpace(mf[fHost].value)
+		it.ID = strings.TrimSpace(mf[fID].value)
+		if id, ok := config.NetworkID(it.Probe, it.ID); ok {
+			it.ID = id
+		}
+		// an empty standby is a missing answer, never a silent 0 W
+		sb, ok := parseNumber(nf[nStandby].value)
+		if !ok || sb < 0 {
+			return it, standbyErr
+		}
+		it.StandbyW = sb
 	}
 	return it, ""
 }
@@ -415,7 +492,11 @@ func (f *itemForm) keys(m *Model) []key {
 		}
 		return []key{{"↑↓", "move"}, {"enter", "choose"}, {"tab", "type watts"}, {"esc", "cancel"}}
 	case stepLabel:
-		return []key{{"tab", "next field"}, {"enter", "continue to mode"}, {"esc", "back to catalog"}}
+		back := "back to catalog"
+		if f.back != nil {
+			back = "back to network devices"
+		}
+		return []key{{"tab", "next field"}, {"enter", "continue to mode"}, {"esc", back}}
 	case stepMode:
 		back := "back"
 		if f.editing != "" {
@@ -438,6 +519,9 @@ func (f *itemForm) draw(m *Model, s *screen) {
 		right = "step 1 of 3 · device"
 	case stepLabel:
 		right = "step 1 of 3 · from label"
+		if f.net != nil {
+			right = "step 1 of 3 · from network"
+		}
 	case stepMode:
 		right = "step 2 of 3 · mode"
 	case stepName:
@@ -636,6 +720,10 @@ func (f *itemForm) drawLabel(m *Model, s *screen, L, Y, lw, R, rw int) {
 	if rw <= 0 {
 		return
 	}
+	if f.net != nil {
+		f.drawFound(m, s, R, Y, rw)
+		return
+	}
 	s.put(R, Y+3, "Where to find it", sTx.bold(), b3)
 	for i, l := range []string{`Look for "Potencia" or a figure`, "ending in W, usually next to", `"120 V ~ 60 Hz".`, "", "Only amps? Watts ≈ 120 × A.", "", "Label watts are a maximum, so", "the estimate may run high."} {
 		s.put(R, Y+5+i, trunc(l, rw), sMu, b3)
@@ -644,42 +732,63 @@ func (f *itemForm) drawLabel(m *Model, s *screen, L, Y, lw, R, rw int) {
 
 func (f *itemForm) drawMode(m *Model, s *screen, L, Y, lw, R, rw int) {
 	s.put(L, Y+3, trunc("How does it count?", lw), sTx.bold(), b3)
-	f.mode.draw(s, L, Y+5, 2, 12, 24, lw-37)
+	end := f.mode.draw(s, L, Y+5, 2, 12, 24, lw-37)
 	md := config.Mode(f.mode.fields[fMode].value)
-	y := Y + 10
-	for _, h := range modeHelp {
+	y := max(Y+10, end+1)
+	helps := modeHelp
+	if slices.Contains(f.mode.fields[fMode].choices, string(config.ModeNetwork)) {
+		helps = append(helps[:0:0], networkHelp)
+		helps = append(helps, modeHelp...)
+	}
+	for _, h := range helps {
 		if h.mode != md {
 			continue
 		}
 		for i, l := range h.long {
 			s.put(L, y+i, trunc(l, lw), sMu, b3)
 		}
+		y += len(h.long)
 	}
-	errLine(s, L, Y+16, lw, f.mode.err)
+	errLine(s, L, max(Y+16, y+1), lw, f.mode.err)
 	if rw <= 0 {
 		return
 	}
 	s.put(R, Y+3, "Modes", sTx.bold(), b3)
-	for i, h := range modeHelp {
+	i := 0
+	for _, h := range helps {
+		if !slices.Contains(f.mode.fields[fMode].choices, string(h.mode)) {
+			continue
+		}
 		sty := sMu
 		mark := "  "
 		if h.mode == md {
 			sty, mark = sT2, "▸ "
 		}
 		s.seqMax(R, Y+5+i, rw, []seg{{mark, sAc.bold()}, {padRight(string(h.mode), 8), st{fg: modeRole(h.mode)}}, {"  " + h.desc, sty}}, b3)
+		i++
 	}
-	s.put(R, Y+10, trunc("Measured, follows and schedule", rw), sMu, b3)
-	s.put(R, Y+11, trunc("items count by themselves;", rw), sMu, b3)
-	s.put(R, Y+12, trunc("manual ones need space.", rw), sMu, b3)
+	y = Y + 6 + max(i, 4)
+	notes := []string{"Measured, follows and schedule", "items count by themselves;", "manual ones need space."}
+	switch {
+	case f.net != nil && f.net.d.Probe == "":
+		notes = []string{"network and measured need a", "state query or a sensor; this", "device has neither, so you", "enter watts and when it is on."}
+	case f.net != nil:
+		notes = []string{"network is offered only for", "devices with a supported state", "query (Samsung, PS5). measured", "needs a sensor; it has none."}
+	case len(helps) > len(modeHelp):
+		notes = []string{"network asks the device for its", "state; the others count by", "themselves, manual with space."}
+	}
+	for j, l := range notes {
+		s.put(R, y+j, trunc(l, rw), sMu, b3)
+	}
 }
 
 func (f *itemForm) drawName(m *Model, s *screen, L, Y, lw, H, R, rw int) {
 	s.put(L, Y+3, trunc("Name and quantity", lw), sTx.bold(), b3)
-	f.name.draw(s, L, Y+5, 2, 12, 24, lw-37)
+	end := f.name.draw(s, L, Y+5, 2, 12, 24, lw-37)
 	it, _ := f.item(m)
 	nf := m.b.nf
 	if it.Mode != config.ModeMeasured && it.Watts > 0 && it.Quantity >= 1 {
-		s.seqMax(L, Y+12, lw, []seg{{"Counts as ", sMu}, {nf.typical(it.Watts) + " × " + itoa(it.Quantity) + " = " + nf.typical(it.TotalWatts()), sTx.bold()}, {" while on", sMu}}, b3)
+		s.seqMax(L, max(Y+12, end), lw, []seg{{"Counts as ", sMu}, {nf.typical(it.Watts) + " × " + itoa(it.Quantity) + " = " + nf.typical(it.TotalWatts()), sTx.bold()}, {" while on", sMu}}, b3)
 	}
 	if f.editing != "" && it.Name != f.editing {
 		if old, ok := m.cfg.Item(f.editing); ok && old.Mode == config.ModeManual {
@@ -702,8 +811,49 @@ func (f *itemForm) drawName(m *Model, s *screen, L, Y, lw, H, R, rw int) {
 		rule = "on " + rangeText(it.Schedule)
 	case config.ModeManual:
 		rule = "on while toggled with space"
+	case config.ModeNetwork:
+		rule = it.Source + " asks " + it.Probe + " at " + it.Host
 	}
 	s.put(R, Y+6, trunc(rule, rw), sMu, b3)
 	s.put(R, Y+8, trunc("Editing a rule recomputes past", rw), sMu, b3)
 	s.put(R, Y+9, trunc("days too.", rw), sMu, b3)
+}
+
+// drawFound is the label step's right pane when adding from the network
+// view: what the scan found, and why watts are or are not filled in.
+func (f *itemForm) drawFound(m *Model, s *screen, R, Y, rw int) {
+	d := f.net
+	s.put(R, Y+3, "From the scan", sTx.bold(), b3)
+	name, _ := nameOf(d.d)
+	s.put(R, Y+5, trunc(name+" · "+d.d.Host, rw), sT2, b3)
+	id, why := "no stable ID", "asked at this address only"
+	switch {
+	case len(d.ids) > 0 && d.ambiguous:
+		id, why = d.ids[0], "another device reports it; not saved"
+	case len(d.ids) > 0:
+		id, why = d.ids[0], "saved as its stable ID"
+	case d.d.Probe == "":
+		why = "no state query; manual or schedule"
+	}
+	s.put(R, Y+6, trunc(id, rw), sMu, b3)
+	s.put(R, Y+7, trunc(why, rw), sMu, b3)
+	var lines []string
+	switch {
+	case d.entry != nil:
+		lines = []string{"Watts are the catalog's typical", "value for this exact model.", "Change them to your device's."}
+	case d.d.Model == "":
+		lines = []string{"No model in the scan, so watts", `are not guessed. Look for`, `"Potencia" or a figure ending`, "in W on the label."}
+	default:
+		lines = []string{"This model is not in the", "catalog, so watts are not", `guessed. Look for "Potencia"`, "or a figure ending in W."}
+	}
+	if d.maybe != "" {
+		lines = append(lines, "", d.maybe+" uses this address;", "check it is not the same device.")
+	}
+	for i, l := range lines {
+		sty := sMu
+		if d.maybe != "" && i >= len(lines)-2 {
+			sty = sWa
+		}
+		s.put(R, Y+9+i, trunc(l, rw), sty, b3)
+	}
 }

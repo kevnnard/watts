@@ -114,12 +114,23 @@ func (*billModal) draw(m *Model, s *screen) {
 		avg = "avg " + nf.kwh2(b.fullAvgWh) + " kWh per full day"
 	}
 	s.seqMax(tx, Y+4, tw, []seg{{nf.kwh1(b.r.Bill.Wh) + " kWh", sT2}, {" · " + avg, sMu}}, b3)
-	if b.partial() {
-		msg := b.offlineNames() + " offline"
-		if !b.offSince.IsZero() {
-			msg += " since " + clock(b.offSince)
+	if b.billLow() {
+		var parts []string
+		if len(b.offline) > 0 {
+			msg := b.offlineNames() + " offline"
+			if !b.offSince.IsZero() {
+				msg += " since " + clock(b.offSince)
+			}
+			parts = append(parts, msg)
 		}
-		s.put(tx, Y+5, trunc(msg+", so these totals may be low", R-tx+1), sWa, b3)
+		if u := unknownTime(b.r.Bill, " state unknown for "); u != "" {
+			parts = append(parts, u)
+		}
+		low := strings.Join(parts, ", ") + ", so these totals may be low"
+		if textWidth(low) > R-tx+1 {
+			low = "Totals may be low: " + b.billLowNote()
+		}
+		s.put(tx, Y+5, trunc(low, R-tx+1), sWa, b3)
 	}
 	if wide {
 		s.put(sideX, Y+2, "Now", sMu, b3)
@@ -129,7 +140,7 @@ func (*billModal) draw(m *Model, s *screen) {
 		t := nf.second(b.r.Today.Cost)
 		room := R - sideX - textWidth(t) - 1
 		if b.partial() {
-			s.put(sideX, Y+4, trunc("partial, "+b.offlineNames()+" offline", room), sWa, b3)
+			s.put(sideX, Y+4, trunc("partial, "+b.nowNote(), room), sWa, b3)
 		} else {
 			s.put(sideX, Y+4, trunc(itoa(b.onCount)+" of "+itoa(len(b.rows))+" items on", room), sMu, b3)
 		}

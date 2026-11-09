@@ -81,6 +81,10 @@ func (s *screen) field(x, y, w int, text string, focused bool, placeholder strin
 		s.put(x+1, y, trunc(placeholder, room), sMu.italic(), b2)
 		return
 	}
+	if !focused {
+		s.put(x+1, y, trunc(text, room), sTx, b2)
+		return
+	}
 	// keep the end of long text, where the cursor is, in view
 	r := []rune(text)
 	for textWidth(string(r)) > room-1 && len(r) > 0 {

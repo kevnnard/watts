@@ -62,6 +62,9 @@ type Model struct {
 	sel   int
 	modal modal
 
+	net   netState // the Network devices view (n)
+	local string   // the machine new network items are asked from
+
 	flash    string
 	flashErr bool
 
@@ -76,7 +79,8 @@ type Model struct {
 // New returns the dashboard over data and edit, starting from cfg and the
 // tariff history h (both already loaded by the caller).
 func New(data Data, edit Editor, cfg *config.Config, h tariff.History, opts ...Option) *Model {
-	m := &Model{data: data, edit: edit, cfg: cloneConfig(cfg), hist: cloneHistory(h), now: time.Now, timeout: 20 * time.Second, cacheKey: [3]int{-1, -1, -1}}
+	m := &Model{data: data, edit: edit, cfg: cloneConfig(cfg), hist: cloneHistory(h), now: time.Now, timeout: 20 * time.Second, cacheKey: [3]int{-1, -1, -1},
+		net: netState{scan: systemScan}, local: localSource()}
 	for _, o := range opts {
 		o(m)
 	}
@@ -160,6 +164,16 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, tick()
 	case savedMsg:
 		return m.saved(msg)
+	case netScanMsg:
+		m.scanned(msg)
+		return m, nil
+	case netTickMsg:
+		if msg.seq != m.net.seq || !m.net.pending {
+			m.ver--
+			return m, nil
+		}
+		m.net.elapsed = int(m.now().Sub(m.net.started).Seconds())
+		return m, scanTick(msg.seq)
 	case tea.KeyPressMsg:
 		return m.key(msg)
 	}
@@ -175,6 +189,7 @@ func (m *Model) rebuild() {
 	if m.sel < 0 {
 		m.sel = 0
 	}
+	m.net.match(m.cfg)
 }
 
 func (m *Model) saved(msg savedMsg) (tea.Model, tea.Cmd) {
@@ -194,6 +209,8 @@ func (m *Model) saved(msg savedMsg) (tea.Model, tea.Cmd) {
 	}
 	if _, keep := m.modal.(*tariffModal); keep && msg.kind == "tariffs" {
 		m.modal.(*tariffModal).saved(m.hist)
+	} else if f, ok := m.modal.(*itemForm); ok && f.back != nil {
+		m.modal = f.back // an item added from the network view returns to it
 	} else {
 		m.modal = nil
 	}
@@ -241,6 +258,8 @@ func (m *Model) key(k tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 		m.modal = newCurrencyModal(m)
 	case "b":
 		m.modal = &billModal{}
+	case "n":
+		return m, m.openNet()
 	}
 	return m, nil
 }

@@ -1,0 +1,40 @@
+ watts   Enel · $990,53 per kWh                                                                                            Sun Nov 8  20:15 
+┌─ Network devices ────────────────────────────────────────────────────────────────────────────────────────────── 5 found · scanned 20:15 ─┐
+│ en0 192.0.2.10/24 · samsung, ddp, ssdp, mdns · multicast may not reach other subnets                                                     │
+│                                                                                                                                          │
+│   Device                 Kind      Brand · model             Address       State       Found by      Counts as             In items      │
+│ ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── │
+│ ▸ Samsung TV             tv        Samsung                   192.0.2.23    ? unknown   samsung ssdp  ~ network estimate    ? TV          │
+│   PS5                    console   Sony · PlayStation 5      192.0.2.31    ◐ standby   ddp           ~ network estimate    ✓ PS5         │
+│   Router                 router    brand not reported        192.0.2.1     ? unknown   ssdp          manual or schedule                  │
+│   Living room speaker    speaker   Google · Nest Mini        192.0.2.57    ? unknown   mdns          manual or schedule                  │
+│   unnamed device         other     not identified            192.0.2.47    ? unknown   mdns          manual or schedule                  │
+│ ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── │
+│ Samsung TV   tv · Samsung · 192.0.2.23                                                                                                   │
+│ ID         uuid:6f1d2c40-8b3e-4a57-9c12-0e4b7a9d3f21   stable; the device is found again if its address changes                          │
+│ State      ? unknown   answered discovery but not the power query; not proof it is off                                                   │
+│ Counts as  ~ network estimate   watts you enter × time it reports on; no sensor, so never measured                                       │
+│ In items   ? TV   uses this address, which alone does not prove it is this device                                                        │
+│ Watts      not known   model not reported; check the label, enter fills in the rest                                                      │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+ ↑↓ select  enter add  r scan again  esc close  n back to the cockpit                                                                       

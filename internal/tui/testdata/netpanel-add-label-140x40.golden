@@ -1,0 +1,40 @@
+ watts   Enel · $990,53 per kWh                                                                                            Sun Nov 8  20:15 
+┌─ Network devices ────────────────────────────────────────────────────────────────────────────────────────────── 5 found · scanned 20:15 ─┐
+│ en0 192.0.2.10/24 · samsung, ddp, ssdp, mdns · multicast may not reach other subnets                                                     │
+│                                                                                                                                          │
+│   Device                 Kind      Brand · model             Address       State       Found by      Counts as             In items      │
+│ ──────────────────┌─ Add item ────────────────────────────────────────────────────────── step 1 of 3 · from network ─┐────────────────── │
+│ ▸ Samsung TV      │ 1 Device  ›  2 Mode  ›  3 Name and quantity                                                      │e                  │
+│   PS5             │                                                                                                  │e    ✓ PS5         │
+│   Router          │ Type the watts printed on the device label                     │ From the scan                   │e                  │
+│   Living room spea│                                                                │                                 │e                  │
+│   unnamed device  │ ▸ Watts      ▏                        W  required              │ Samsung TV · 192.0.2.23         │e                  │
+│ ──────────────────│                                                                │ uuid:6f1d2c40-8b3e-4a57-9c12-0… │────────────────── │
+│ Samsung TV   tv · │   Quantity   1                                                 │ saved as its stable ID          │                   │
+│ ID         uuid:6f│                                                                │                                 │                   │
+│ State      ? unkno│   Kind       tv                       from network             │ No model in the scan, so watts  │                   │
+│ Counts as  ~ netwo│                                                                │ are not guessed. Look for       │                   │
+│ Watts      not kno│   Brand      Samsung                  from network             │ "Potencia" or a figure ending   │                   │
+│                   │                                                                │ in W on the label.              │                   │
+│                   │   Model      not reported                                      │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   └──────────────────────────────────────────────────────────────────────────────────────────────────┘                   │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+ tab next field  enter continue to mode  esc back to network devices                                                                        

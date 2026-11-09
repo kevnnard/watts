@@ -45,7 +45,7 @@ func StatusText(r energy.Report, sources []Source, cfg *config.Config, ansi bool
 
 	total := []seg{{"Now     ", sMu}, {nf.watts(r.TotalWatts), sTx.bold()}, {"  " + nf.watts(b.measuredW) + " measured + ~" + nf.watts(b.estimatedW) + " estimated", sMu}}
 	if b.partial() {
-		total = append(total, seg{"  partial · " + b.offlineNames() + " offline", sWa})
+		total = append(total, seg{"  partial · " + b.nowNote(), sWa})
 	}
 	line(total...)
 
@@ -61,6 +61,9 @@ func StatusText(r energy.Report, sources []Source, cfg *config.Config, ansi bool
 		if note := ddcNote(rw); note != "" {
 			parts = append(parts, seg{" · " + note, sMu})
 		}
+		if rw.it.Mode == config.ModeNetwork {
+			parts = append(parts, seg{" · " + netNote(rw), sMu})
+		}
 		line(parts...)
 	}
 	out.WriteByte('\n')
@@ -68,6 +71,9 @@ func StatusText(r energy.Report, sources []Source, cfg *config.Config, ansi bool
 	today := []seg{{"Today   ", sMu}, {nf.kwh2(r.Today.Wh) + " kWh  " + nf.money(r.Today.Cost), sTx.bold()}}
 	if s := nf.second(r.Today.Cost); s != "" {
 		today = append(today, seg{"  " + s, sMu})
+	}
+	if u := unknownTime(r.Today, " unknown "); u != "" {
+		today = append(today, seg{"  may be low: " + u, sWa})
 	}
 	line(today...)
 	bill := []seg{{"Bill    ", sMu}, {nf.money(r.Bill.Cost), sTx.bold()}, {" so far", sMu}}
@@ -81,8 +87,8 @@ func StatusText(r energy.Report, sources []Source, cfg *config.Config, ansi bool
 	line(bill...)
 	if !r.Period.Start.IsZero() {
 		period := []seg{{"        " + r.Period.Start.Format("Jan 2") + " → " + r.Period.End.Format("Jan 2") + " · day " + itoa(b.dayIdx) + " of " + itoa(b.days) + " · " + nf.kwh1(r.Bill.Wh) + " kWh", sMu}}
-		if b.partial() {
-			period = append(period, seg{" · may be low: " + b.offlineNames() + " missing", sWa})
+		if b.billLow() {
+			period = append(period, seg{" · may be low: " + b.billLowNote(), sWa})
 		}
 		line(period...)
 	}

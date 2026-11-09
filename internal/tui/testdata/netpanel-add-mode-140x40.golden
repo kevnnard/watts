@@ -1,0 +1,40 @@
+ watts   Enel · $990,53 per kWh                                                                                            Sun Nov 8  20:15 
+┌─ Network devices ────────────────────────────────────────────────────────────────────────────────────────────── 5 found · scanned 20:15 ─┐
+│ en0 192.0.2.10/24 · samsung, ddp, ssdp, mdns · multicast may not reach other subnets                                                     │
+│                                                                                                                                          │
+│   Device                 Kind      Brand · model             Address       State       Found by      Counts as             In items      │
+│ ──────────────────┌─ Add item ────────────────────────────────────────────────────────────────── step 2 of 3 · mode ─┐────────────────── │
+│ ▸ Samsung TV      │ 1 Device  ›  2 Mode  ›  3 Name and quantity                                                      │e                  │
+│   PS5             │                                                                                                  │e    ✓ PS5         │
+│   Router          │ How does it count?                                             │ Modes                           │e                  │
+│   Living room spea│                                                                │                                 │e                  │
+│   unnamed device  │ ▸ Mode       ‹ network            ›                            │ ▸ network   reported on/standby │e                  │
+│ ──────────────────│                                                                │   schedule  on at set hours     │────────────────── │
+│ Samsung TV   tv · │   Source       mac                    the machine that asks it │   manual    on when toggled     │                   │
+│ ID         uuid:6f│                                                                │                                 │                   │
+│ State      ? unkno│   Probe        samsung                                         │                                 │                   │
+│ Counts as  ~ netwo│                                                                │ network is offered only for     │                   │
+│ Watts      not kno│   Host       192.0.2.23               IPv4 address             │ devices with a supported state  │                   │
+│                   │                                                                │ query (Samsung, PS5). measured  │                   │
+│                   │   ID         uuid:6f1d2c40-8b3e-4a…   optional · uuid:, mac: … │ needs a sensor; it has none.    │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │ Watts while the device reports on,                             │                                 │                   │
+│                   │ standby watts in standby, shown                                │                                 │                   │
+│                   │ with ~. When it does not answer,                               │                                 │                   │
+│                   │ the state is unknown: that time                                │                                 │                   │
+│                   │ is not counted as off, nor filled in.                          │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   └──────────────────────────────────────────────────────────────────────────────────────────────────┘                   │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+ ←→ change  tab next field  enter continue  esc back                                                                                        

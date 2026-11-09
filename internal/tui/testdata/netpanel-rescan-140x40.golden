@@ -1,0 +1,40 @@
+ watts   Enel · $990,53 per kWh                                                                                            Sun Nov 8  20:15 
+┌─ Network devices ───────────────────────────────────────────────────────────────────────────────────────────────────────────── scanning ─┐
+│ en0 192.0.2.10/24 · samsung, ddp, ssdp, mdns · multicast may not reach other subnets                                                     │
+│                                                                                                                                          │
+│   Device                 Kind      Brand · model             Address       State       Found by      Counts as             In items      │
+│ ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── │
+│   Samsung TV             tv        Samsung                   192.0.2.23    ? unknown   samsung ssdp  ~ network estimate                  │
+│ ▸ PS5                    console   Sony · PlayStation 5      192.0.2.31    ◐ standby   ddp           ~ network estimate    ✓ PS5         │
+│   Router                 router    brand not reported        192.0.2.1     ? unknown   ssdp          manual or schedule                  │
+│   Living room speaker    speaker   Google · Nest Mini        192.0.2.57    ? unknown   mdns          manual or schedule                  │
+│   unnamed device         other     not identified            192.0.2.47    ? unknown   mdns          manual or schedule                  │
+│ ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── │
+│ PS5   console · Sony · PlayStation 5 · 192.0.2.31                                                                                        │
+│ ID         ps:a1b2c3d4e5f6   stable; the device is found again if its address changes                                                    │
+│ State      ◐ standby   reported standby to the power query                                                                               │
+│ Counts as  ~ network estimate   watts you enter × time it reports on; no sensor, so never measured                                       │
+│ In items   ✓ PS5   matched by ID; enter does not add it twice                                                                            │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+ ↑↓ select  enter add  r scanning…  esc close  n back to the cockpit                                                                        

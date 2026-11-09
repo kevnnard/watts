@@ -80,6 +80,16 @@ Then choose how the device counts:
 
 Catalog watts are typical values, not measurements. If you change a device's watts or its rule, past days are recalculated too.
 
+### From your network (`n`)
+
+Press **`n`** for **Network devices**: the devices this machine finds on its local networks, as `watts scan` lists them. The first time you open it, it scans for about 3 seconds; **`r`** scans again, and the list stays usable while it does. **`esc`** or **`n`** closes it and stops a scan that is still running.
+
+- Each row shows the device's address, its state (`on` or `standby` only when it reports them, otherwise `unknown`, never off) and how it can count.
+- **In items** shows `✓ TV` when one of your items has this device's ID. An item that only shares its address shows `? TV`: an address can be reused by another device, so it proves nothing.
+- **`enter`** opens **Add item** filled in with what was found. Everything stays editable, and **`esc`** goes back to the list. Watts are filled in only when the catalog has the exact model; otherwise type them from the label.
+- A Samsung TV or a PS5 can be added as a **network** item, with the machine that asks it, its address and its ID ([details](#tv-and-ps5-network)). Any other device can only count as **manual** or **schedule**.
+- Multicast doesn't cross routers, so a device on another subnet isn't found.
+
 ## Your bill
 
 Press **`b`** for the bill view: what you have spent so far this period, what the full bill will be if you keep the same pace, and one bar per day.
@@ -99,14 +109,16 @@ Press **`b`** for the bill view: what you have spent so far this period, what th
 | `e` | edit the selected device | `c` | currency |
 | `d` | delete the selected device | `b` | bill view |
 | `space` | switch a manual device on or off | `↑` `↓` / `j` `k` | move |
-| `esc` | close a window | `q` | quit |
+| `n` | network devices | `r` | scan again (in network devices) |
+| `enter` | add the selected network device | `esc` | close a window |
+| `q` | quit | | |
 
 ## Commands
 
 | Command | What it does |
 |:--|:--|
 | `watts` | Opens the dashboard. |
-| `watts status` | Prints a short text summary, handy in scripts or a status bar. |
+| `watts status` | Prints a short text summary, handy in scripts or a status bar. When some time is unknown, it says the totals may be low. |
 | `watts install [--dry-run] [--binary PATH]` | Starts the background recorder: a LaunchAgent on macOS, a systemd user service on Linux. `--dry-run` shows what it would do and changes nothing. `--binary` picks the binary the recorder runs (default: this one, by its stable path, so a Homebrew install survives `brew upgrade`). |
 | `watts daemon` | The recorder itself. `watts install` runs it for you. |
 | `watts sensors [--json]` | Shows one reading of this machine's sensor. |
@@ -186,6 +198,55 @@ Limits:
 - Multicast and broadcast stay inside one network. A device behind another router isn't found, even if you can reach it.
 - Guest or isolated Wi-Fi hides devices from each other.
 - A device that is fully off, or has no network, can't answer. Scan while it is on.
+</details>
+
+<details>
+<summary><b>TV and PS5 watts from their power state (network)</b></summary>
+
+<a id="tv-and-ps5-network"></a>
+
+A Samsung TV or a PS5 tells the network whether it is on or in standby. The recorder can ask it every minute and count an estimate: `watts` while on, `standby_w` in standby. It is an estimate from the state, not a measurement, and a PS5 that is on is not proof that someone is playing.
+
+Add it from the dashboard with **`n`** and **`enter`**, or add a `network` item to `~/.config/watts/config.toml` with the `host` and `id` that `watts scan` prints:
+
+```toml
+[[items]]
+  name = "TV"
+  mode = "network"
+  source = "mac"
+  probe = "samsung"
+  host = "192.0.2.16"
+  id = "uuid:…"
+  watts = 63.0
+  standby_w = 0.5
+  quantity = 1
+```
+
+| Field | Meaning |
+|:--|:--|
+| `source` | The machine whose recorder asks the device: `mac` or `linux`. Only that recorder asks it. A Mac dashboard reads the states of `linux` items from the PC, like its watts. |
+| `probe` | `samsung` (a Samsung TV) or `ps5`. |
+| `host` | The device's IPv4 address. |
+| `id` | Optional. `uuid:…` or `mac:…` for a Samsung TV, `ps:…` for a PS5. |
+| `watts`, `standby_w` | Watts while on and in standby. The catalog suggests 63 W and 0.5 W for a Samsung QLED Q60D, 217 W and 1.2 W for a PS5 Slim. Change them to your device's. A `standby_w` of 0 counts 0 W. |
+
+What each answer counts:
+
+| The device | Recorded as | Counts |
+|:--|:--|:--|
+| says on | `on` | `watts` |
+| says standby | `standby` | `standby_w` |
+| doesn't answer, or gives no state | `unknown`, not off | nothing |
+| was not asked (the recorder was off) | no reading | nothing |
+
+Unknown time is not counted as 0 W: the totals of a day with unknown time are the least the device used. The dashboard, the bill view and `watts status` keep the totals and mark them `partial` or `may be low`, naming the device and how long its state was unknown. A device in standby shows `◐` and `~standby_w`; one without a recent answer shows `?` and `unknown`, never 0 W.
+
+With an `id`:
+- An answer only counts when the device at `host` reports that `id`. Another device at that address gives unknown.
+- When the router gives the device a new address, the recorder scans the network, at most once every 10 minutes. It moves to the new address only when exactly one address reports the `id` and the device there confirms it. Two consoles with one `id`, or a device found only by its address or its mDNS name, never move it.
+- The new address is kept until the recorder restarts. The config file is never changed; update `host` yourself to keep it.
+
+Without an `id`, the recorder asks `host` only, and an answer proves no identity.
 </details>
 
 <details>

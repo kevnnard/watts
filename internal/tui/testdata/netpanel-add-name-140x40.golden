@@ -1,0 +1,40 @@
+ watts   Enel · $990,53 per kWh                                                                                            Sun Nov 8  20:15 
+┌─ Network devices ────────────────────────────────────────────────────────────────────────────────────────────── 5 found · scanned 20:15 ─┐
+│ en0 192.0.2.10/24 · samsung, ddp, ssdp, mdns · multicast may not reach other subnets                                                     │
+│                                                                                                                                          │
+│   Device                 Kind      Brand · model             Address       State       Found by      Counts as             In items      │
+│ ──────────────────┌─ Add item ────────────────────────────────────────────────────────────────── step 3 of 3 · name ─┐────────────────── │
+│ ▸ Samsung TV      │ 1 Device  ›  2 Mode  ›  3 Name and quantity                                                      │e                  │
+│   PS5             │                                                                                                  │e    ✓ PS5         │
+│   Router          │ Name and quantity                                              │ Summary                         │e                  │
+│   Living room spea│                                                                │                                 │e                  │
+│   unnamed device  │   Name       Samsung TV                                        │ network                         │e                  │
+│ ──────────────────│                                                                │ mac asks samsung at 192.0.2.23  │────────────────── │
+│ Samsung TV   tv · │   Watts      80                       W per unit, on           │                                 │                   │
+│ ID         uuid:6f│                                                                │ Editing a rule recomputes past  │                   │
+│ State      ? unkno│   Quantity   1                                                 │ days too.                       │                   │
+│ Counts as  ~ netwo│                                                                │                                 │                   │
+│ Watts      not kno│ ▸ Standby    ▏                        W per unit, 0 or more    │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │ Counts as 80 W × 1 = 80 W while on                             │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   │                                                                │                                 │                   │
+│                   └──────────────────────────────────────────────────────────────────────────────────────────────────┘                   │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+│                                                                                                                                          │
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+ tab next field  enter add item  esc back to mode                                                                                           

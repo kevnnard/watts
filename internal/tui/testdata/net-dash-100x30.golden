@@ -1,0 +1,30 @@
+ watts  Enel · $990,53 per kWh                                                         Nov 8  20:15 
+┌─ Now ──────────────────────────────┐┌─ Today ───────────────────┐┌─ Bill ───────────── day 8/30 ─┐
+│ 133,3 W                    partial ││ 1,83 kWh                  ││ $11.876 of $29.100            │
+│ 80,8 W + ~52,5 W                   ││ $1.814                    ││ ██████████░░░░░░░░░░░░░░ 41 % │
+│   ▁▁▁   ▁▄▄▅▅▅▅▄▄▃▃▃▃▄▄▅▅▅▅▄▄▄▄▅▅▆ ││ ≈ US$0.45                 ││ ≈ US$2.97 so far              │
+│ ██████████████████████████████████ ││ may be low                ││ 12,0 kWh · 22 days left       │
+│ ██████████████████████████████████ ││ most PC Linux 43 %        ││ projection may be low         │
+│ last 3 h                       now ││ 00:00 → 20:15             ││ Nov 1 → Dec 1                 │
+└────────────────────────────────────┘└───────────────────────────┘└───────────────────────────────┘
+┌─ Items ────────────────────────────────────────────────────────────────────────────────────── 7 ─┐
+│    Item        Mode                                     Now  last 3 h                 kWh   Cost │
+│  ● PC Linux    measured linux · ssh kevnnard-stat…   70,9 W  ▅▆▆▅▅▅▅▅▆▅▅▅▄▅▅▆▆▅▅▅▆▆  0,78   $772 │
+│  ● Mac         measured mac · this machine            9,9 W  ▅▅▅▅▅▅▅▅▆▅▅▅▆▅▅▅▆▅▅▅▆▅  0,14   $139 │
+│  ● LG 29WQ600  follows  on while Mac or PC Linux …  ~25,0 W  ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇  0,31   $307 │
+│  ● Room lights schedule 3 × LED bulb 9 W · 18:00–…  ~27,0 W       ▂▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅  0,06    $59 │
+│  ○ Desk fan    manual   off since 15:50 · space t…      0 W  off                     0,13   $129 │
+│  ◐ TV          network  mac · standby · 192.0.2.23   ~0,5 W                          0,01    $12 │
+│▸ ? PS5         network  linux · no reading since …  unknown                          0,40   $396 │
+│                                                                                                  │
+│                                                                                                  │
+│                                                                                                  │
+│                                                                                                  │
+│                                                                                                  │
+│                                                                                                  │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘
+  Period  PC 5,4   LG 2,1   PS5 2,1   Mac 1,0   fan 0,7   lights 0,6   TV 0,1 kWh                   
+  mac ● online 20:15   linux ● online 20:14                                     samples every 60 s  
+  W measured   ~W estimated   ● on  ○ off  ✗ offline                                                
+  updated 20:15:05                                                                                  
+ a add  e edit  d delete  space toggle  t tariffs  c currency  b bill  q quit  n network            

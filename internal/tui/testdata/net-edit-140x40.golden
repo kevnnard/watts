@@ -1,0 +1,40 @@
+ watts   Enel · $990,53 per kWh                                                                                            Sun Nov 8  20:15 
+┌─ Now ────────────────────────────────────────────────────────┐┌─ Today ──────────────────────────┐┌─ Bill ───────────────── day 8 of 30 ─┐
+│ Total  133,3 W  partial · PS5 unknown        4 of 7 items on ││ 1,83 kWh                  $1.814 ││ $11.876 so far             ≈ US$2.97 │
+│ 80,8 W measured  +  ~52,5 W estimated                        ││ 00:00 → 20:15          ≈ US$0.45 ││ projected $29.100          ≈ US$7.28 │
+│                                                              ││ may be low: PS5 unknown          ││ may be low: PS5 unknown 3 h 10 min   │
+│ ██████████████████┌─ Edit TV ─────────────────────────────────────────────────────────────────── step 2 of 3 · mode ─┐░░░░░░░░░░░░  41 % │
+│ PC Linux          │ 1 Device  ›  2 Mode  ›  3 Name and quantity                                                      │ days left         │
+│                   │                                                                                                  │                   │
+│ Last 3 h          │ How does it count?                                             │ Modes                           │               kWh │
+│                ▂▃▃│                                                                │                                 │             1,5   │
+│ ▅▅▆▆▇▇▆▆▆▆▅▅▅▅▅███│ ▸ Mode       ‹ network            ›                            │ ▸ network   reported on/standby │                   │
+│ ██████████████████│                                                                │   measured  sensor watts        │············ 0     │
+│ ██████████████████│   Source       mac                    the machine that asks it │   follows   on with a machine   │       Dec 1       │
+│ 17:15          18:│                                                                │   schedule  on at set hours     │ull day            │
+└───────────────────│   Probe        samsung                                         │   manual    on when toggled     │───────────────────┘
+┌─ Items ───────────│                                                                │                                 │─────────────── 7 ─┐
+│     Item          │   Host       192.0.2.23               IPv4 address             │ network asks the device for its │     Cost    Share │
+│   ● PC Linux      │                                                                │ state; the others count by      │     $772     43 % │
+│   ● Mac           │   ID         uuid:6f1d2c40-8b3e-4a…   optional · uuid:, mac: … │ themselves, manual with space.  │     $139      8 % │
+│   ● LG 29WQ600    │                                                                │                                 │     $307     17 % │
+│   ● Room lights   │                                                                │                                 │      $59      3 % │
+│   ○ Desk fan      │ Watts while the device reports on,                             │                                 │     $129      7 % │
+│ ▸ ◐ TV            │ standby watts in standby, shown                                │                                 │      $12      1 % │
+│   ? PS5           │ with ~. When it does not answer,                               │                                 │     $396     22 % │
+│                   │ the state is unknown: that time                                │                                 │                   │
+└───────────────────│ is not counted as off, nor filled in.                          │                                 │───────────────────┘
+┌─ Period by item ──│                                                                │                                 │───────────────────┐
+│ Item              │                                                                │                                 │       Last sample │
+│ PC Linux     █████│                                                                │                                 │r)        20:15:02 │
+│ LG 29WQ600   ▓▓▓▓▓│                                                                │                                 │+ GPU …   20:14:58 │
+│ PS5          ▓▓▓▓▓│                                                                │                                 │                   │
+│ Mac          █████│                                                                │                                 │                   │
+│ + 3 more · b shows│                                                                │                                 │                   │
+│                   └──────────────────────────────────────────────────────────────────────────────────────────────────┘                   │
+│ Measured 6,4 kWh   Estimated ~5,6 kWh                              ││                                                                    │
+│                                                                    ││                                                                    │
+│ Estimated = watts × time on by its rule. Editing a rule            ││ W measured   ~W estimated   ● on  ○ off  ✗ offline                 │
+│ recomputes past days too.                                          ││                                                                    │
+└────────────────────────────────────────────────────────────────────┘└────────────────────────────────────────────────────────────────────┘
+ ←→ change  tab next field  enter continue  esc cancel                                                                                      

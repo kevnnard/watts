@@ -24,8 +24,15 @@ func newFix(t *testing.T, offline bool, w, h int) (*Model, *fakeData, *fakeEdito
 // newFixData is newFix with a given fake and config.
 func newFixData(t *testing.T, d *fakeData, cfg *config.Config, w, h int) (*Model, *fakeData, *fakeEditor) {
 	t.Helper()
+	// never the real network: n scans the artboard fixture
+	return newFixScan(t, d, cfg, &fakeScan{res: fixScan()}, w, h)
+}
+
+// newFixScan is newFixData with a given scanner.
+func newFixScan(t *testing.T, d *fakeData, cfg *config.Config, sc *fakeScan, w, h int) (*Model, *fakeData, *fakeEditor) {
+	t.Helper()
 	e := &fakeEditor{}
-	m := New(d, e, cfg, fixHistory(), WithClock(func() time.Time { return fixNow }))
+	m := New(d, e, cfg, fixHistory(), WithClock(func() time.Time { return fixNow }), WithScanner(sc.scan), WithLocalSource(config.SourceMac))
 	m.Update(tea.WindowSizeMsg{Width: w, Height: h})
 	run(t, m, m.Init())
 	if !m.loaded {
@@ -44,6 +51,10 @@ func run(t *testing.T, m *Model, cmd tea.Cmd) {
 			_, cmd = m.Update(msg)
 		case refreshMsg:
 			m.Update(msg)
+			return
+		case tea.BatchMsg:
+			// a network scan and its tick: apply the scan, drop the tick
+			m.Update(<-scanOf(t, func() tea.Msg { return msg }))
 			return
 		default:
 			m.Update(msg)
@@ -145,6 +156,10 @@ var screens = []struct {
 	keys    []string
 	text    string // typed after keys
 	more    []string
+	net     bool                  // the network fixture: TV in standby, PS5 unknown
+	cfg     func() *config.Config // instead of the fixture config
+	scan    *fakeScan             // instead of the artboard scan
+	pending string                // a key whose scan is left running: "n" or "r"
 }{
 	{name: "dash-140x40", w: 140, h: 40},
 	{name: "dash-100x30", w: 100, h: 30},
@@ -166,18 +181,57 @@ var screens = []struct {
 	{name: "currency-80x24", w: 80, h: 24, keys: []string{"c"}},
 	{name: "delete-80x24", w: 80, h: 24, keys: []string{"d"}},
 	{name: "small-79x24", w: 79, h: 24},
+	{name: "net-dash-140x40", net: true, w: 140, h: 40},
+	{name: "net-dash-100x30", net: true, w: 100, h: 30, keys: []string{"j", "j", "j", "j", "j", "j"}},
+	{name: "net-dash-80x24", net: true, w: 80, h: 24, keys: []string{"j", "j", "j", "j", "j", "j"}},
+	{name: "net-bill-140x40", net: true, w: 140, h: 40, keys: []string{"b"}},
+	{name: "net-bill-80x24", net: true, w: 80, h: 24, keys: []string{"b"}},
+	{name: "net-edit-140x40", net: true, w: 140, h: 40, keys: []string{"j", "j", "j", "j", "j", "e"}},
+	{name: "netpanel-loading-140x40", w: 140, h: 40, pending: "n"},
+	{name: "netpanel-loading-100x30", w: 100, h: 30, pending: "n"},
+	{name: "netpanel-loading-80x24", w: 80, h: 24, pending: "n"},
+	{name: "netpanel-results-140x40", cfg: ps5Config, w: 140, h: 40, keys: []string{"n"}},
+	{name: "netpanel-results-100x30", cfg: ps5Config, w: 100, h: 30, keys: []string{"n"}},
+	{name: "netpanel-results-80x24", cfg: ps5Config, w: 80, h: 24, keys: []string{"n"}},
+	{name: "netpanel-added-140x40", cfg: ps5Config, w: 140, h: 40, keys: []string{"n", "down", "enter"}},
+	{name: "netpanel-rescan-140x40", cfg: ps5Config, w: 140, h: 40, keys: []string{"n", "down"}, pending: "r"},
+	{name: "netpanel-rescan-80x24", cfg: ps5Config, w: 80, h: 24, keys: []string{"n", "down"}, pending: "r"},
+	{name: "netpanel-maybe-140x40", cfg: tvAtConfig, w: 140, h: 40, keys: []string{"n"}},
+	{name: "netpanel-maybe-80x24", cfg: tvAtConfig, w: 80, h: 24, keys: []string{"n"}},
+	{name: "netpanel-error-140x40", scan: &fakeScan{err: errNoIface}, w: 140, h: 40, keys: []string{"n"}},
+	{name: "netpanel-error-100x30", scan: &fakeScan{err: errNoIface}, w: 100, h: 30, keys: []string{"n"}},
+	{name: "netpanel-error-80x24", scan: &fakeScan{err: errNoIface}, w: 80, h: 24, keys: []string{"n"}},
+	{name: "netpanel-empty-140x40", scan: &fakeScan{res: NetScan{Interfaces: fixScan().Interfaces}}, w: 140, h: 40, keys: []string{"n"}},
+	{name: "netpanel-empty-80x24", scan: &fakeScan{res: NetScan{Interfaces: fixScan().Interfaces}}, w: 80, h: 24, keys: []string{"n"}},
+	{name: "netpanel-add-label-140x40", cfg: ps5Config, w: 140, h: 40, keys: []string{"n", "enter"}},
+	{name: "netpanel-add-label-80x24", cfg: ps5Config, w: 80, h: 24, keys: []string{"n", "enter"}},
+	{name: "netpanel-add-mode-140x40", cfg: ps5Config, w: 140, h: 40, keys: []string{"n", "enter"}, text: "80", more: []string{"enter"}},
+	{name: "netpanel-add-name-140x40", cfg: ps5Config, w: 140, h: 40, keys: []string{"n", "enter"}, text: "80", more: []string{"enter", "enter", "tab", "tab", "tab"}},
+	{name: "netpanel-add-router-140x40", cfg: ps5Config, w: 140, h: 40, keys: []string{"n", "down", "down", "enter"}, text: "9", more: []string{"enter"}},
 }
 
 func screenModel(t *testing.T, i int) *Model {
 	sc := screens[i]
 	cfg := fixConfig()
-	if sc.ddc {
+	switch {
+	case sc.ddc:
 		cfg = fixDDCConfig()
+	case sc.net:
+		cfg = fixNetConfig()
+	case sc.cfg != nil:
+		cfg = sc.cfg()
 	}
-	m, _, _ := newFixData(t, &fakeData{offline: sc.offline, ddc: sc.ddc}, cfg, sc.w, sc.h)
+	scan := &fakeScan{res: fixScan()}
+	if sc.scan != nil {
+		scan = &fakeScan{res: sc.scan.res, err: sc.scan.err}
+	}
+	m, _, _ := newFixScan(t, &fakeData{offline: sc.offline, ddc: sc.ddc, net: sc.net}, cfg, scan, sc.w, sc.h)
 	press(t, m, sc.keys...)
 	typeText(t, m, sc.text)
 	press(t, m, sc.more...)
+	if sc.pending != "" {
+		m.Update(keyMsg(sc.pending)) // the scan command is never run
+	}
 	return m
 }
 
@@ -193,7 +247,7 @@ func TestGoldenScreens(t *testing.T) {
 
 // Nothing overflows or wraps at any width ≥ 80, with or without a modal.
 func TestNoOverflowAnySize(t *testing.T) {
-	for _, keys := range [][]string{nil, {"a"}, {"a", "tab"}, {"b"}, {"t"}, {"t", "a"}, {"c"}, {"d"}, {"e"}, {"e", "enter"}} {
+	for _, keys := range [][]string{nil, {"a"}, {"a", "tab"}, {"b"}, {"t"}, {"t", "a"}, {"c"}, {"d"}, {"e"}, {"e", "enter"}, {"n"}, {"n", "enter"}, {"n", "down", "enter", "tab", "tab"}, {"n", "enter", "tab", "enter"}} {
 		for _, off := range []bool{false, true} {
 			for w := 80; w <= 170; w += 3 {
 				for _, h := range []int{24, 27, 30, 39, 40, 44} {
