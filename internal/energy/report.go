@@ -15,13 +15,19 @@ type ItemNow struct {
 	Watts float64 // 0 when off or offline
 	On    bool
 	// Offline is set for a measured item whose newest sample is older than
-	// GapIntervals × interval (or that has none). Show it as offline, not 0 W.
+	// GapIntervals × interval (or that has none), and for a network item
+	// without a fresh known state. Show it as offline, not 0 W.
 	Offline bool
-	LastTS  time.Time // newest sample time for measured items, zero if none
+	LastTS  time.Time // newest sample (network: reading) time for measured and network items, zero if none
 	// Display is set for a follows item with ddc while a fresh DDC reading
 	// (at most GapIntervals × interval old) drives Watts: the DDC estimate,
 	// on even while the monitor sleeps at standby watts.
 	Display *DisplayState
+	// Network is set for a network item with a fresh reading (at most
+	// GapIntervals × interval old). On is set for on and for standby, at
+	// standby watts; an unknown state leaves the item offline. nil means no
+	// fresh reading: the item is offline.
+	Network *NetworkState
 }
 
 // Now returns the state of it at now.
@@ -58,6 +64,9 @@ func Now(in Input, it config.Item, now time.Time) ItemNow {
 		}
 	case config.ModeManual:
 		n.On = ManualOn(in.Data.Toggles[it.Name], now)
+	case config.ModeNetwork:
+		nowNetwork(in, it, now, &n)
+		return n
 	}
 	if n.On {
 		n.Watts = it.TotalWatts()
@@ -97,10 +106,11 @@ func (in Input) stale(s store.Sample, now time.Time) bool {
 
 // ItemTotal is one item's energy and cost over a window.
 type ItemTotal struct {
-	Name      string
-	Wh        float64
-	OnSeconds float64
-	Cost      float64
+	Name           string
+	Wh             float64
+	OnSeconds      float64
+	Cost           float64
+	UnknownSeconds float64 // see Result
 }
 
 // Totals is energy and cost over [From, To).
@@ -109,6 +119,9 @@ type Totals struct {
 	Wh       float64
 	Cost     float64
 	Items    []ItemTotal // in config order
+	// Incomplete is set when some item has unknown time in the window:
+	// Wh and Cost leave it out, so they are a lower bound.
+	Incomplete bool
 }
 
 // KWh is Wh / 1000.
@@ -123,9 +136,10 @@ func Window(in Input, from, to time.Time, pricePerKWh float64) Totals {
 	for _, it := range in.Items {
 		r := ItemEnergy(in, it, from, to)
 		c := Cost(r.Wh, pricePerKWh)
-		t.Items = append(t.Items, ItemTotal{Name: it.Name, Wh: r.Wh, OnSeconds: r.OnSeconds, Cost: c})
+		t.Items = append(t.Items, ItemTotal{Name: it.Name, Wh: r.Wh, OnSeconds: r.OnSeconds, Cost: c, UnknownSeconds: r.UnknownSeconds})
 		t.Wh += r.Wh
 		t.Cost += c
+		t.Incomplete = t.Incomplete || r.UnknownSeconds > 0
 	}
 	return t
 }

@@ -16,6 +16,9 @@
 //   - schedule: watts × quantity during the daily ranges; a range whose end
 //     is before its start runs to that time on the next day.
 //   - manual: watts × quantity between an "on" toggle and the next "off".
+//   - network: watts × quantity while the daemon's readings of the item
+//     say on, standby_w × quantity in standby; unknown and missing time
+//     count nothing and are reported as unknown time (network.go).
 //
 // Estimated items are derived at read time, so config edits apply
 // retroactively.
@@ -82,6 +85,10 @@ func (in Input) item(name string) (config.Item, bool) {
 type Result struct {
 	Wh        float64
 	OnSeconds float64
+	// UnknownSeconds is, for a network item, the time of the window whose
+	// state is not known (an unknown reading or none). Wh counts nothing
+	// for it, so Wh is then a lower bound. Always 0 for other modes.
+	UnknownSeconds float64
 }
 
 // ItemEnergy integrates one item over [from, to).
@@ -90,6 +97,7 @@ func ItemEnergy(in Input, it config.Item, from, to time.Time) Result {
 	for _, d := range itemDays(in, it, from, to) {
 		r.Wh += d.Wh
 		r.OnSeconds += d.OnSeconds
+		r.UnknownSeconds += d.UnknownSeconds
 	}
 	return r
 }
@@ -107,6 +115,8 @@ func itemDays(in Input, it config.Item, from, to time.Time) []Result {
 		fixed(scheduleSpans(in, it, from, to), it.TotalWatts(), days, out)
 	case config.ModeManual:
 		fixed(manualSpans(in.Data.Toggles[it.Name], to), it.TotalWatts(), days, out)
+	case config.ModeNetwork:
+		network(in, it, days, out)
 	}
 	return out
 }
