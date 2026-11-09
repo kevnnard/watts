@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" role="img" aria-label="manual">
+  <title>manual</title>
+  <rect width="40" height="40" rx="10" fill="#0e1014"/>
+  <rect x="8" y="13" width="24" height="14" rx="7" fill="none" stroke="#f0abfc" stroke-width="3"/>
+  <circle cx="25" cy="20" r="4" fill="#f0abfc"/>
+</svg>

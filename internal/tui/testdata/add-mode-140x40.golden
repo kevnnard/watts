@@ -1,0 +1,40 @@
+ watts   Enel · $990,53 per kWh                                                                                            Sun Nov 8  20:15 
+┌─ Now ────────────────────────────────────────────────────────┐┌─ Today ──────────────────────────┐┌─ Bill ───────────────── day 8 of 30 ─┐
+│ Total  132,8 W                               4 of 5 items on ││ 1,42 kWh                  $1.406 ││ $9.707 so far              ≈ US$2.43 │
+│ 80,8 W measured  +  ~52,0 W estimated                        ││ 00:00 → 20:15          ≈ US$0.35 ││ projected $29.100          ≈ US$7.28 │
+│                                                              ││                                  ││                                      │
+│ ██████████████████┌─ Add item ────────────────────────────────────────────────────────────────── step 2 of 3 · mode ─┐░░░░░░░░░░░░  33 % │
+│ PC Linux          │ 1 Device  ›  2 Mode  ›  3 Name and quantity                                                      │days left          │
+│                   │                                                                                                  │                   │
+│ Last 3 h          │ How does it count?                                             │ Modes                           │               kWh │
+│                ▂▃▃│                                                                │                                 │             1,5   │
+│ ▅▅▆▆▇▇▆▆▆▆▅▅▅▅▅███│ ▸ Mode       ‹ follows            ›                            │   measured  sensor watts        │                   │
+│ ██████████████████│                                                                │ ▸ follows   on with a machine   │············ 0     │
+│ ██████████████████│   Follows    PC Linux, Mac            names, comma separated   │   schedule  on at set hours     │       Dec 1       │
+│ 17:15          18:│                                                                │   manual    on when toggled     │ull day            │
+└───────────────────│                                                                │                                 │───────────────────┘
+┌─ Items ───────────│ Fixed watts while any of the                                   │ Measured, follows and schedule  │─────────────── 5 ─┐
+│     Item          │ measured items it follows is on.                               │ items count by themselves;      │     Cost    Share │
+│ ▸ ● PC Linux      │                                                                │ manual ones need space.         │     $772     55 % │
+│     ├ CPU         │                                                                │                                 │                   │
+│     ├ GPU         │                                                                │                                 │                   │
+│     └ rest        │                                                                │                                 │                   │
+│   ● Mac           │                                                                │                                 │     $139     10 % │
+│   ● LG 29WQ600    │                                                                │                                 │     $307     22 % │
+│   ● Room lights   │                                                                │                                 │      $59      4 % │
+│   ○ Desk fan      │                                                                │                                 │     $129      9 % │
+└───────────────────│                                                                │                                 │───────────────────┘
+┌─ Period by item ──│                                                                │                                 │───────────────────┐
+│ Item              │                                                                │                                 │       Last sample │
+│ PC Linux     █████│                                                                │                                 │r)        20:15:02 │
+│ LG 29WQ600   ▓▓▓▓▓│                                                                │                                 │+ GPU …   20:14:58 │
+│ Mac          █████│                                                                │                                 │                   │
+│ Desk fan     ▓▓▓▓ │                                                                │                                 │                   │
+│ Room lights  ▓▓▓  │                                                                │                                 │                   │
+│                   └──────────────────────────────────────────────────────────────────────────────────────────────────┘                   │
+│ Measured 6,4 kWh   Estimated ~3,4 kWh                              ││                                                                    │
+│                                                                    ││                                                                    │
+│ Estimated = watts × time on by its rule. Editing a rule            ││ W measured   ~W estimated   ● on  ○ off  ✗ offline                 │
+│ recomputes past days too.                                          ││                                                                    │
+└────────────────────────────────────────────────────────────────────┘└────────────────────────────────────────────────────────────────────┘
+ ←→ change  tab next field  enter continue  esc back                                                                                        

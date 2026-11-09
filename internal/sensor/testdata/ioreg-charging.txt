@@ -1,0 +1,15 @@
++-o AppleSmartBattery  <class AppleSmartBattery, id 0x1000002b4, registered, matched, active, busy 0 (0 ms), retain 7>
+    {
+      "PostChargeWaitSeconds" = 120
+      "built-in" = Yes
+      "AppleRawAdapterDetails" = ({"AdapterID"=0,"Watts"=96,"Current"=4750,"FamilyCode"=18446744073172697098,"Voltage"=20000,"Description"="pd charger","IsWireless"=No,"PMUConfiguration"=0})
+      "UserVisiblePathUpdated" = 1762642311
+      "ExternalConnected" = Yes
+      "AppleRawCurrentCapacity" = 6029
+      "PowerTelemetryData" = {"AccumulatedWallEnergyEstimate"=151315019,"SystemEnergyConsumed"=6716,"SystemPowerInAccumulatorCount"=10204,"AdapterEfficiencyLoss"=543,"SystemLoad"=24178,"AccumulatedSystemLoad"=490768463,"AccumulatedSystemEnergyConsumed"=137526477,"SystemCurrentIn"=1194,"WallEnergyEstimate"=7259,"SystemVoltageIn"=20250,"SystemPowerIn"=24178,"AccumulatedBatteryPower"=268014092,"PowerTelemetryErrorCount"=0,"AccumulatedSystemPowerIn"=495112822,"BatteryPower"=0,"BatteryDischargeAccumulatorCount"=19391}
+      "IsCharging" = No
+      "CurrentCapacity" = 100
+      "FullyCharged" = Yes
+      "ExternalChargeCapable" = Yes
+    }
+    

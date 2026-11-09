@@ -1,0 +1,24 @@
+ watts  Enel · $990,53 per kWh                                     Nov 8  20:15 
+┌─ Now ────────────────────┐┌─ Today ──────────────┐┌─ Bill ──────── day 8/30 ─┐
+│ 132,8 W        4 of 5 on ││ 1,42 kWh             ││ $9.707 of $29.100        │
+│ 80,8 W + ~52,0 W         ││ $1.406               ││ ██████░░░░░░░░░░░░░ 33 % │
+│  ▁▁   ▄▄▅▅▅▄▃▃▃▄▅▅▅▄▄▄▅▆ ││ ≈ US$0.35            ││ ≈ US$2.43 so far         │
+│ ████████████████████████ ││                      ││ 9,8 kWh · 22 days left   │
+│ ████████████████████████ ││ most PC Linux 55 %   ││ projected, not billed    │
+│ last 3┌─ Delete item ────────────────────────────────────────────────┐       │
+└───────│                                                              │───────┘
+┌─ Items│ Delete PC Linux?                                             │─── 5 ─┐
+│    Ite│ It leaves the config. Samples stay in the store, but         │  Cost │
+│▸ ● PC │ today and the bill stop counting it.                         │  $772 │
+│    ├ C│                                                              │       │
+│    └ r│                                                              │       │
+│  ● Mac│                                                              │  $139 │
+│  ● LG └──────────────────────────────────────────────────────────────┘  $307 │
+│  ● Room lights schedule 3 × LED bulb 9 …  ~27,0 W     ▅▅▅▅▅▅▅▅▅  0,06    $59 │
+│  ○ Desk fan    manual   off since 15:50…      0 W  off           0,13   $129 │
+└──────────────────────────────────────────────────────────────────────────────┘
+  Period  PC 5,4   LG 2,1   Mac 1,0   fan 0,7   lights 0,6 kWh                  
+  mac ● online 20:15   linux ● online 20:14                 samples every 60 s  
+  W measured   ~W estimated   ● on  ○ off  ✗ offline                            
+  updated 20:15:05                                                              
+ y delete  n keep  esc cancel                                                   

@@ -1,0 +1,5 @@
++-o AppleSmartBattery  <class AppleSmartBattery, id 0x1000002b4, registered, matched, active, busy 0 (0 ms), retain 7>
+    {
+      "ExternalConnected" = Yes
+      "PowerTelemetryData" = {"AccumulatedSystemPowerIn"=495112822,"SystemVoltageIn"=20250}
+    }

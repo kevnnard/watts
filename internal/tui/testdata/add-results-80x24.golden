@@ -1,0 +1,24 @@
+ watts  Enel · $990,53 per kWh                                     Nov 8  20:15 
+┌─┌─ Add item ──────────────────────────────────────── step 1 of 3 · device ─┐─┐
+│ │ 1 Device  ›  2 Mode  ›  3 Name and quantity                              │ │
+│ │                                                                          │ │
+│ │ Search catalog  kind, brand or model                                     │ │
+│ │  › lg▏                                                                   │ │
+│ │ 6 matches · best first                                                   │ │
+│ │                                                                          │ │
+└─│   Kind       Brand  Model                                  Typical       │─┘
+┌─│ ▸ monitor    LG     29WQ600 · 29" UltraWide IPS, typical on   22 W added │─┐
+│ │   monitor    LG     27UL500 · 27" 4K IPS                      30 W       │ │
+│▸│   monitor    LG     24MK430H · 24" IPS                        18 W       │ │
+│ │   monitor    LG     34WP65C · 34" curved UltraWide            38 W       │ │
+│ │   tv         LG     55" OLED C2 · typical on                 110 W       │ │
+│ │   tv         LG     43" UR8050 · typical on                   65 W       │ │
+│ │                                                                          │ │
+│ │ ──────────────────────────────────────────────────────────────────────── │ │
+│ │   + Type watts from the device label  not in the catalog                 │ │
+└─│                                                                          │─┘
+  │                                                                          │  
+  │                                                                          │  
+  │                                                                          │  
+  └──────────────────────────────────────────────────────────────────────────┘  
+ ↑↓ move  enter choose  tab type watts  esc cancel                              

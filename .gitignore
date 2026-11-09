@@ -1,0 +1,32 @@
+# Private working notes: planning docs and design mockups stay local.
+/odd/
+/design/
+/.pi/
+
+# Build output
+/watts
+/usage
+/dist/
+/bin/
+*.exe
+
+# Go test and profiling artifacts
+*.test
+*.out
+*.prof
+coverage.*
+/tmp/
+
+# Local data that must never be committed
+*.db
+*.db-shm
+*.db-wal
+.env
+.env.*
+
+# OS and editors
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*~

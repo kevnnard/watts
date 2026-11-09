@@ -1,0 +1,10 @@
++-o AppleSmartBattery  <class AppleSmartBattery, id 0x1000002b4, registered, matched, active, busy 0 (0 ms), retain 7>
+    {
+      "built-in" = Yes
+      "ExternalConnected" = No
+      "PowerTelemetryData" = {"AccumulatedWallEnergyEstimate"=151315019,"SystemPowerInAccumulatorCount"=10204,"SystemLoad"=9120,"SystemCurrentIn"=0,"SystemVoltageIn"=0,"SystemPowerIn"=0,"AccumulatedBatteryPower"=268014092,"AccumulatedSystemPowerIn"=495112822,"BatteryPower"=9120}
+      "IsCharging" = No
+      "CurrentCapacity" = 87
+      "ExternalChargeCapable" = No
+    }
+    

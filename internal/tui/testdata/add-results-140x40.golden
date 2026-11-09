@@ -1,0 +1,40 @@
+ watts   Enel · $990,53 per kWh                                                                                            Sun Nov 8  20:15 
+┌─ Now ────────────────────────────────────────────────────────┐┌─ Today ──────────────────────────┐┌─ Bill ───────────────── day 8 of 30 ─┐
+│ Total  132,8 W                               4 of 5 items on ││ 1,42 kWh                  $1.406 ││ $9.707 so far              ≈ US$2.43 │
+│ 80,8 W measured  +  ~52,0 W estimated                        ││ 00:00 → 20:15          ≈ US$0.35 ││ projected $29.100          ≈ US$7.28 │
+│                                                              ││                                  ││                                      │
+│ ██████████████████┌─ Add item ──────────────────────────────────────────────────────────────── step 1 of 3 · device ─┐░░░░░░░░░░░░  33 % │
+│ PC Linux          │ 1 Device  ›  2 Mode  ›  3 Name and quantity                                                      │days left          │
+│                   │                                                                                                  │                   │
+│ Last 3 h          │ Search catalog  kind, brand or model                           │ LG 29WQ600                      │               kWh │
+│                ▂▃▃│  › lg▏                                                         │ monitor · 29" UltraWide IPS, t… │             1,5   │
+│ ▅▅▆▆▇▇▆▆▆▆▅▅▅▅▅███│ 6 matches · best first                                         │                                 │                   │
+│ ██████████████████│                                                                │ Typical  22 W                   │············ 0     │
+│ ██████████████████│   Kind       Brand  Model                        Typical       │ Already in your items once      │       Dec 1       │
+│ 17:15          18:│ ▸ monitor    LG     29WQ600 · 29" UltraWide IPS, …  22 W added │                                 │ull day            │
+└───────────────────│   monitor    LG     27UL500 · 27" 4K IPS            30 W       │ Next, choose how it counts      │───────────────────┘
+┌─ Items ───────────│   monitor    LG     24MK430H · 24" IPS              18 W       │ measured  sensor watts          │─────────────── 5 ─┐
+│     Item          │   monitor    LG     34WP65C · 34" curved UltraWide  38 W       │ follows   on with a machine     │     Cost    Share │
+│ ▸ ● PC Linux      │   tv         LG     55" OLED C2 · typical on       110 W       │ schedule  on at set hours       │     $772     55 % │
+│     ├ CPU         │   tv         LG     43" UR8050 · typical on         65 W       │ manual    on when toggled       │                   │
+│     ├ GPU         │                                                                │                                 │                   │
+│     └ rest        │ ────────────────────────────────────────────────────────────── │ Catalog watts are typical, not  │                   │
+│   ● Mac           │   + Type watts from the device label  not in the catalog       │ measured. Adjust them in step … │     $139     10 % │
+│   ● LG 29WQ600    │                                                                │                                 │     $307     22 % │
+│   ● Room lights   │                                                                │                                 │      $59      4 % │
+│   ○ Desk fan      │                                                                │                                 │     $129      9 % │
+└───────────────────│                                                                │                                 │───────────────────┘
+┌─ Period by item ──│                                                                │                                 │───────────────────┐
+│ Item              │                                                                │                                 │       Last sample │
+│ PC Linux     █████│                                                                │                                 │r)        20:15:02 │
+│ LG 29WQ600   ▓▓▓▓▓│                                                                │                                 │+ GPU …   20:14:58 │
+│ Mac          █████│                                                                │                                 │                   │
+│ Desk fan     ▓▓▓▓ │                                                                │                                 │                   │
+│ Room lights  ▓▓▓  │                                                                │                                 │                   │
+│                   └──────────────────────────────────────────────────────────────────────────────────────────────────┘                   │
+│ Measured 6,4 kWh   Estimated ~3,4 kWh                              ││                                                                    │
+│                                                                    ││                                                                    │
+│ Estimated = watts × time on by its rule. Editing a rule            ││ W measured   ~W estimated   ● on  ○ off  ✗ offline                 │
+│ recomputes past days too.                                          ││                                                                    │
+└────────────────────────────────────────────────────────────────────┘└────────────────────────────────────────────────────────────────────┘
+ ↑↓ move  enter choose  tab type watts  esc cancel                                                                                          

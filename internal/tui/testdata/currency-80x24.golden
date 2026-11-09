@@ -1,0 +1,24 @@
+ watts  Enel · $990,53 per kWh                                     Nov 8  20:15 
+┌─ Now ────────────────────┐┌─ Today ──────────────┐┌─ Bill ──────── day 8/30 ─┐
+│ 132,8 W        4 of 5 on ││ 1,42 kWh             ││ $9.707 of $29.100        │
+│ 80,8 W + ~52,0 W         ││ $1.406               ││ ██████░░░░░░░░░░░░░ 33 % │
+│ ┌─ Currency ───────────────────────────────────────────────────────────────┐ │
+│ │                                                                          │ │
+│ │ Costs show in the main currency; the secondary one is a                  │ │
+│ │ conversion at your rate, not a live exchange rate.                       │ │
+└─│                                                                          │─┘
+┌─│ ▸ Main       COP▏           COP, USD, EUR or any 3-letter code           │─┐
+│ │                                                                          │ │
+│▸│   Secondary  USD            shown dimmed next to main                    │ │
+│ │                                                                          │ │
+│ │   Rate       4000           main units per 1 secondary                   │ │
+│ │                                                                          │ │
+│ │ Preview  $10.000  ≈ US$2.50                                              │ │
+│ │                                                                          │ │
+│ └──────────────────────────────────────────────────────────────────────────┘ │
+└──────────────────────────────────────────────────────────────────────────────┘
+  Period  PC 5,4   LG 2,1   Mac 1,0   fan 0,7   lights 0,6 kWh                  
+  mac ● online 20:15   linux ● online 20:14                 samples every 60 s  
+  W measured   ~W estimated   ● on  ○ off  ✗ offline                            
+  updated 20:15:05                                                              
+ tab next field  enter save  esc cancel                                         

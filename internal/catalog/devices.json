@@ -1,0 +1,58 @@
+[
+  {"kind": "monitor", "brand": "LG", "model": "29WQ600", "watts": 22, "min_w": 7, "max_w": 22, "standby_w": 0.3, "note": "29\" UltraWide IPS, typical on"},
+  {"kind": "monitor", "brand": "LG", "model": "27UL500", "watts": 30, "note": "27\" 4K IPS"},
+  {"kind": "monitor", "brand": "LG", "model": "24MK430H", "watts": 18, "note": "24\" IPS"},
+  {"kind": "monitor", "brand": "LG", "model": "34WP65C", "watts": 38, "note": "34\" curved UltraWide"},
+  {"kind": "monitor", "brand": "Dell", "model": "P2422H", "watts": 14, "note": "24\" 1080p"},
+  {"kind": "monitor", "brand": "Dell", "model": "U2723QE", "watts": 25, "note": "27\" 4K"},
+  {"kind": "monitor", "brand": "Samsung", "model": "Odyssey G5 27", "watts": 37, "note": "27\" 1440p 144 Hz"},
+  {"kind": "monitor", "brand": "Samsung", "model": "S24F350", "watts": 20, "note": "24\" 1080p"},
+  {"kind": "monitor", "brand": "ASUS", "model": "VG249Q", "watts": 20, "note": "24\" 144 Hz"},
+  {"kind": "monitor", "brand": "AOC", "model": "24G2", "watts": 20, "note": "24\" 144 Hz"},
+  {"kind": "monitor", "brand": "BenQ", "model": "GW2480", "watts": 15, "note": "24\" 1080p"},
+  {"kind": "monitor", "brand": "Apple", "model": "Studio Display", "watts": 30, "note": "27\" 5K, typical brightness"},
+
+  {"kind": "bulb", "brand": "Philips", "model": "LED A19 9W", "watts": 9, "note": "60 W equivalent"},
+  {"kind": "bulb", "brand": "Philips", "model": "Hue White and Color A19", "watts": 9, "note": "smart bulb"},
+  {"kind": "bulb", "brand": "Xiaomi", "model": "Mi Smart LED Bulb", "watts": 10, "note": "smart bulb"},
+  {"kind": "bulb", "brand": "Sylvania", "model": "LED A60 12W", "watts": 12, "note": "75 W equivalent"},
+  {"kind": "bulb", "brand": "Generic", "model": "LED bulb 9W", "watts": 9, "note": "label watts"},
+  {"kind": "bulb", "brand": "Generic", "model": "LED bulb 12W", "watts": 12, "note": "label watts"},
+  {"kind": "bulb", "brand": "Generic", "model": "LED spot GU10 5W", "watts": 5, "note": "label watts"},
+
+  {"kind": "strip", "brand": "Govee", "model": "LED Strip 5m", "watts": 24, "note": "RGB, typical colors"},
+  {"kind": "strip", "brand": "Philips", "model": "Hue Lightstrip Plus 2m", "watts": 20, "note": "full brightness"},
+  {"kind": "strip", "brand": "Xiaomi", "model": "Mi LED Lightstrip 2m", "watts": 10, "note": "RGB"},
+  {"kind": "strip", "brand": "Generic", "model": "LED strip 5050 5m", "watts": 36, "note": "60 LED/m, mixed colors"},
+
+  {"kind": "fan", "brand": "Samurai", "model": "Silence Force", "watts": 60, "note": "pedestal fan, high speed"},
+  {"kind": "fan", "brand": "Samurai", "model": "Turbo Silence", "watts": 50, "note": "floor fan"},
+  {"kind": "fan", "brand": "Xiaomi", "model": "Mi Smart Standing Fan 2", "watts": 15, "note": "DC motor, medium speed"},
+  {"kind": "fan", "brand": "Dyson", "model": "Pure Cool TP07", "watts": 40, "note": "purifier fan"},
+  {"kind": "fan", "brand": "Generic", "model": "USB desk fan", "watts": 3, "note": "USB powered"},
+
+  {"kind": "router", "brand": "TP-Link", "model": "Archer C6", "watts": 8, "note": "dual-band Wi-Fi 5"},
+  {"kind": "router", "brand": "TP-Link", "model": "Deco M4", "watts": 6, "note": "per mesh unit"},
+  {"kind": "router", "brand": "ASUS", "model": "RT-AX58U", "watts": 12, "note": "Wi-Fi 6"},
+  {"kind": "router", "brand": "Google", "model": "Nest Wifi", "watts": 6, "note": "per unit"},
+  {"kind": "router", "brand": "Generic", "model": "ISP fiber modem/ONT", "watts": 10, "note": "modem plus Wi-Fi"},
+
+  {"kind": "speaker", "brand": "Amazon", "model": "Echo Dot", "watts": 3, "note": "idle listening"},
+  {"kind": "speaker", "brand": "Google", "model": "Nest Mini", "watts": 2, "note": "idle listening"},
+  {"kind": "speaker", "brand": "Sonos", "model": "One", "watts": 5, "note": "typical playback"},
+  {"kind": "speaker", "brand": "Edifier", "model": "R1280T", "watts": 10, "note": "bookshelf pair, moderate volume"},
+  {"kind": "speaker", "brand": "Logitech", "model": "Z313", "watts": 12, "note": "2.1 desktop, moderate volume"},
+  {"kind": "speaker", "brand": "JBL", "model": "Flip 6", "watts": 10, "note": "while charging"},
+
+  {"kind": "charger", "brand": "Apple", "model": "20W USB-C", "watts": 15, "note": "iPhone charging, average"},
+  {"kind": "charger", "brand": "Samsung", "model": "25W Super Fast", "watts": 18, "note": "phone charging, average"},
+  {"kind": "charger", "brand": "Generic", "model": "Phone charger 5W", "watts": 5, "note": "USB-A"},
+  {"kind": "charger", "brand": "Generic", "model": "Laptop charger 65W", "watts": 45, "note": "laptop charging, average"},
+
+  {"kind": "tv", "brand": "Samsung", "model": "43\" Crystal UHD CU7000", "watts": 62, "note": "typical on"},
+  {"kind": "tv", "brand": "Samsung", "model": "32\" T4300", "watts": 25, "note": "typical on"},
+  {"kind": "tv", "brand": "LG", "model": "55\" OLED C2", "watts": 110, "note": "typical on"},
+  {"kind": "tv", "brand": "LG", "model": "43\" UR8050", "watts": 65, "note": "typical on"},
+  {"kind": "tv", "brand": "Xiaomi", "model": "TV A2 43\"", "watts": 60, "note": "typical on"},
+  {"kind": "tv", "brand": "TCL", "model": "50\" 4K P635", "watts": 80, "note": "typical on"}
+]
