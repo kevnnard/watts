@@ -110,6 +110,7 @@ Press **`b`** for the bill view: what you have spent so far this period, what th
 | `watts install [--dry-run] [--binary PATH]` | Starts the background recorder: a LaunchAgent on macOS, a systemd user service on Linux. `--dry-run` shows what it would do and changes nothing. `--binary` picks the binary the recorder runs (default: this one, by its stable path, so a Homebrew install survives `brew upgrade`). |
 | `watts daemon` | The recorder itself. `watts install` runs it for you. |
 | `watts sensors [--json]` | Shows one reading of this machine's sensor. |
+| `watts scan` | Lists the devices it finds on your local networks. It only reads: nothing is saved or added. |
 | `watts export --json [--from TIME] [--to TIME]` | Prints stored readings as JSON. The Mac uses this to read the Linux PC. |
 | `watts import-consumo [--dir DIR]` | Imports the daily files of the old `consumo` scripts. The files are only read, never changed. |
 | `watts version` | Prints the version. |
@@ -156,6 +157,35 @@ A monitor's draw depends on its brightness. When the monitor is plugged into the
 - `min_w`, `max_w` and `standby_w` are optional. Without them `watts` uses the catalog's values for the model, or else 30 % of `watts`, `watts` and 0.3 W.
 - The recorder finds the monitor with `ddcutil detect` when it starts. To pick the bus yourself, add `[display]` with `bus = 4` (for `/dev/i2c-4`).
 - Without a recent reading (the PC is off, or `ddcutil` is missing) the item counts its fixed `watts` while the machines it follows are on, as before. The dashboard shows `brightness 65 % · DDC via linux` while the estimate is live.
+</details>
+
+<details>
+<summary><b>Find devices on your network</b></summary>
+
+`watts scan` looks for devices on every local network this machine is on, Wi-Fi or wired, for about 3 seconds. It asks with SSDP/UPnP (smart TVs, Roku, Xbox), mDNS/Bonjour (Chromecast, Google TV, Apple TV, Shelly) and PlayStation discovery (PS4, PS5). It only reads: it saves nothing and adds no device.
+
+It only connects to devices that answered, at the address they answered from. It never goes through a proxy and never follows a redirect. Answers, connections and downloads are capped for each scan, so a noisy network can't make it grow without limit; when a cap is hit, it prints a `note`.
+
+```text
+NAME         BRAND/MODEL            STATE    PROBE    WATTS    HOST        ID
+Living room  Google Chromecast      unknown  none     unknown  192.0.2.30  mdns:…
+PS5-001      Sony PS5               standby  ps5      unknown  192.0.2.40  ps:…
+TV           Samsung QN55Q60DAKXZL  on       samsung  unknown  192.0.2.16  uuid:…
+
+3 devices answered within 3s.
+Probe none: watts can't read its power state; add it as a manual or schedule item.
+…
+```
+
+- **State** is `on` or `standby` only when the device says so: a Samsung TV's api, or a PlayStation's answer. Every other device is `unknown`. A device that doesn't answer is not proven off.
+- **Probe** `samsung` or `ps5` means `watts` can read the device's power state. `none` means the device was only found: add it as a **manual** or **schedule** item.
+- **Watts** is the catalog's typical value when the catalog has that exact brand and model. Otherwise it is `unknown`; `watts` never guesses a rating.
+- **ID** stays the same when the router gives the device a new address.
+
+Limits:
+- Multicast and broadcast stay inside one network. A device behind another router isn't found, even if you can reach it.
+- Guest or isolated Wi-Fi hides devices from each other.
+- A device that is fully off, or has no network, can't answer. Scan while it is on.
 </details>
 
 <details>

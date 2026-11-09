@@ -31,6 +31,7 @@ var commands = []command{
 		"export --json [--from TIME] [--to TIME]", func(fs *flag.FlagSet) { exportFlags(fs) }},
 	{"sensors", "print one reading of this machine's power sensor", runSensors,
 		"sensors [--json]", func(fs *flag.FlagSet) { sensorsFlags(fs) }},
+	{"scan", "list the devices found on the local networks (SSDP, mDNS, PS DDP); writes nothing", runScan, "", nil},
 	{"install", "write and load the LaunchAgent (macOS) or systemd user unit (Linux) that runs the daemon", runInstall,
 		"install [--dry-run] [--binary PATH]", func(fs *flag.FlagSet) { installFlags(fs) }},
 	{"import-consumo", "import the consumo daily ledgers as daily aggregates (re-running replaces, never adds)", runImport,
@@ -120,6 +121,16 @@ Monitor watts from DDC (config keys; the Linux daemon reads them with ddcutil):
   min_w, max_w, standby_w    optional, per unit; default: the catalog model's values
                              (LG 29WQ600: 7, 22, 0.3), else 0.3 x watts, watts, 0.3
   [display] bus = N          the monitor's /dev/i2c-N; default: ddcutil detect at start
+
+Network scan (watts scan):
+  Searches every local IPv4 network this machine is on for about 3 s and prints
+  each device's name, brand/model, state, probe, catalog watts, host and stable ID.
+  state      on or standby from a power-state answer (Samsung TV api/v2, PS5 DDP);
+             unknown otherwise. No answer never means off.
+  probe      samsung or ps5 can be polled; none is discovery only: add it as a
+             manual or schedule item
+  watts      typical watts when the catalog has the exact brand and model, else unknown
+  Multicast and broadcast don't cross routers; guest or isolated Wi-Fi hides devices.
 
 Environment:
   XDG_CONFIG_HOME, XDG_DATA_HOME  move the config and the data dir
