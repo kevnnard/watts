@@ -46,7 +46,7 @@ func TestValidateErrors(t *testing.T) {
 	}{
 		{"empty name", func(c *Config) { c.Items[0].Name = " " }, `item 1: name is required`},
 		{"duplicate name", func(c *Config) { c.Items[1].Name = "mac" }, `item "mac": duplicate name`},
-		{"unknown mode", func(c *Config) { c.Items[0].Mode = "solar" }, `item "Mac": unknown mode "solar" (want measured, follows, schedule or manual)`},
+		{"unknown mode", func(c *Config) { c.Items[0].Mode = "solar" }, `item "Mac": unknown mode "solar" (want measured, follows, schedule, manual or network)`},
 		{"bad source", func(c *Config) { c.Items[0].Source = "windows" }, `item "Mac": source must be "mac" or "linux", got "windows"`},
 		{"psu efficiency", func(c *Config) { c.Items[1].PSUEfficiency = 1.5 }, `item "PC Linux": psu_efficiency must be greater than 0 and at most 1, got 1.5`},
 		{"negative rest", func(c *Config) { c.Items[1].RestW = -1 }, `item "PC Linux": rest_w must not be negative, got -1`},

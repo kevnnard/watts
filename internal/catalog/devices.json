@@ -54,5 +54,8 @@
   {"kind": "tv", "brand": "LG", "model": "55\" OLED C2", "watts": 110, "note": "typical on"},
   {"kind": "tv", "brand": "LG", "model": "43\" UR8050", "watts": 65, "note": "typical on"},
   {"kind": "tv", "brand": "Xiaomi", "model": "TV A2 43\"", "watts": 60, "note": "typical on"},
-  {"kind": "tv", "brand": "TCL", "model": "50\" 4K P635", "watts": 80, "note": "typical on"}
+  {"kind": "tv", "brand": "TCL", "model": "50\" 4K P635", "watts": 80, "note": "typical on"},
+  {"kind": "tv", "brand": "Samsung", "model": "55\" QLED Q60D (QN55Q60D)", "watts": 63, "standby_w": 0.5, "probe": "samsung", "note": "SDR on, standby 0.5 W; HDR draws more"},
+
+  {"kind": "console", "brand": "Sony", "model": "PlayStation 5 Slim (disc)", "watts": 217, "standby_w": 1.2, "probe": "ps5", "note": "while playing; rest mode 1.2 W with internet on"}
 ]

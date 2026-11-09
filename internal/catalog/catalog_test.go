@@ -96,8 +96,34 @@ func TestDDCRange(t *testing.T) {
 		if e.Model == "29WQ600" {
 			continue
 		}
-		if e.MinW != 0 || e.MaxW != 0 || e.StandbyW != 0 {
+		if e.MinW != 0 || e.MaxW != 0 || (e.StandbyW != 0 && e.Probe == "") {
 			t.Errorf("%s has a DDC range %+v, want none", e.Label(), e)
+		}
+	}
+}
+
+func TestNetworkDevices(t *testing.T) {
+	for _, tt := range []struct {
+		brand, model, kind, probe string
+		watts, standby            float64
+	}{
+		{"Samsung", `55" QLED Q60D (QN55Q60D)`, KindTV, "samsung", 63, 0.5},
+		{"Sony", "PlayStation 5 Slim (disc)", KindConsole, "ps5", 217, 1.2},
+	} {
+		e, ok := Find(tt.brand, tt.model)
+		if !ok || e.Kind != tt.kind || e.Probe != tt.probe || e.Watts != tt.watts || e.StandbyW != tt.standby || e.Note == "" {
+			t.Errorf("%s %s = %+v, %v", tt.brand, tt.model, e, ok)
+		}
+	}
+	if got := Search("playstation"); len(got) != 1 || got[0].Probe != "ps5" {
+		t.Errorf(`Search("playstation") = %+v`, got)
+	}
+	for _, e := range All() {
+		if e.Probe != "" && e.Probe != "samsung" && e.Probe != "ps5" {
+			t.Errorf("%s has probe %q", e.Label(), e.Probe)
+		}
+		if e.Probe != "" && e.StandbyW <= 0 {
+			t.Errorf("%s has a probe but no standby watts", e.Label())
 		}
 	}
 }

@@ -1,7 +1,7 @@
 // Package config loads, validates and saves the user configuration at
 // $XDG_CONFIG_HOME/watts/config.toml (default ~/.config/watts/config.toml).
 //
-// The config holds the consumption items (S2), the currency choice (S5), the
+// The config holds the consumption items (S2, S19, S20), the currency choice (S5), the
 // remote host for the Linux PC (S9) and the daemon sample interval (S7).
 // Tariff history is data, not configuration; it lives in the data dir (see
 // TariffPath and package tariff).
@@ -30,6 +30,7 @@ const (
 	ModeFollows  Mode = "follows"  // fixed watts while any followed measured item is on
 	ModeSchedule Mode = "schedule" // fixed watts during daily time ranges
 	ModeManual   Mode = "manual"   // fixed watts while toggled on in the TUI
+	ModeNetwork  Mode = "network"  // estimated watts by the power state a LAN query reads (S20)
 )
 
 // Sensor sources for measured items.
@@ -75,7 +76,17 @@ type Item struct {
 	DDC      string  `toml:"ddc,omitempty"`
 	MinW     float64 `toml:"min_w,omitzero"`
 	MaxW     float64 `toml:"max_w,omitzero"`
-	StandbyW float64 `toml:"standby_w,omitzero"`
+	StandbyW float64 `toml:"standby_w,omitzero"` // also network: watts per unit in standby
+	// Network only (S20): the daemon of source ("mac" or "linux") asks the
+	// device at host with probe for its power state every sample. id is the
+	// stable identity from a scan ("uuid:…" or "mac:…" for samsung, "ps:…"
+	// for ps5), or empty. With it, an answer only counts when the device
+	// reports that identity, and a device with a new address is found again.
+	// Watts per unit are watts while on and standby_w in standby; an omitted
+	// standby_w is 0.
+	Probe string `toml:"probe,omitempty"`
+	Host  string `toml:"host,omitempty"`
+	ID    string `toml:"id,omitempty"`
 }
 
 // DDC defaults when neither the item nor its catalog entry sets them:
@@ -305,7 +316,7 @@ func (c *Config) Validate() error {
 			return fmt.Errorf("item %q: %w", it.Name, err)
 		}
 	}
-	return nil
+	return c.validateNetworkIDs()
 }
 
 func (it Item) validate(byName map[string]Item) error {
@@ -315,7 +326,12 @@ func (it Item) validate(byName map[string]Item) error {
 	if err := it.validateDDC(); err != nil {
 		return err
 	}
+	if it.Mode != ModeNetwork && (it.Probe != "" || it.Host != "" || it.ID != "") {
+		return fmt.Errorf("probe, host and id are only for network items, got mode %q", it.Mode)
+	}
 	switch it.Mode {
+	case ModeNetwork:
+		return it.validateNetwork()
 	case ModeMeasured:
 		if it.Source != SourceMac && it.Source != SourceLinux {
 			return fmt.Errorf("source must be %q or %q, got %q", SourceMac, SourceLinux, it.Source)
@@ -329,7 +345,7 @@ func (it Item) validate(byName map[string]Item) error {
 		return nil
 	case ModeFollows, ModeSchedule, ModeManual:
 	default:
-		return fmt.Errorf("unknown mode %q (want measured, follows, schedule or manual)", it.Mode)
+		return fmt.Errorf("unknown mode %q (want measured, follows, schedule, manual or network)", it.Mode)
 	}
 	if it.Watts <= 0 {
 		return errors.New("watts must be greater than 0")
@@ -366,6 +382,12 @@ func (it Item) validate(byName map[string]Item) error {
 // follows item; validateDDCWatts checks their values.
 func (it Item) validateDDC() error {
 	if it.DDC == "" {
+		if it.Mode == ModeNetwork {
+			if it.MinW != 0 || it.MaxW != 0 {
+				return fmt.Errorf("min_w and max_w need ddc = %q; a network item uses watts and standby_w", SourceLinux)
+			}
+			return nil
+		}
 		if it.MinW != 0 || it.MaxW != 0 || it.StandbyW != 0 {
 			return fmt.Errorf("min_w, max_w and standby_w need ddc = %q", SourceLinux)
 		}
@@ -470,7 +492,9 @@ func LoadOrCreate(path string) (c *Config, created bool, err error) {
 const header = `# watts config. Docs: watts --help.
 # Item modes: measured (source = "mac" | "linux"), follows (watts while any
 # listed measured item is on), schedule (watts during "HH:MM-HH:MM" ranges,
-# which may cross midnight) and manual (watts while toggled on in the TUI).
+# which may cross midnight), manual (watts while toggled on in the TUI) and
+# network (a Samsung TV or PS5 whose on or standby state the daemon of source
+# asks at host; no answer counts as unknown, never off).
 
 `
 

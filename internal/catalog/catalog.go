@@ -21,6 +21,7 @@ const (
 	KindSpeaker = "speaker"
 	KindCharger = "charger"
 	KindTV      = "tv"
+	KindConsole = "console"
 )
 
 // Entry is one catalog device.
@@ -31,10 +32,15 @@ type Entry struct {
 	Watts float64 `json:"watts"`
 	Note  string  `json:"note,omitempty"`
 	// Optional DDC estimate range for monitors (S19): watts at brightness 0
-	// and 100 while on, and in standby. Zero means unknown.
+	// and 100 while on, and in standby. Zero means unknown. Network devices
+	// (S20) set StandbyW too: their watts in standby or rest mode.
 	MinW     float64 `json:"min_w,omitempty"`
 	MaxW     float64 `json:"max_w,omitempty"`
 	StandbyW float64 `json:"standby_w,omitempty"`
+	// Probe is the network query that reads the device's power state
+	// (S20): "samsung" or "ps5", as config.ProbeSamsung and ProbePS5. ""
+	// means its state cannot be read; count it manually or by schedule.
+	Probe string `json:"probe,omitempty"`
 }
 
 // Label is "Brand Model".
