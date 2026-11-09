@@ -38,9 +38,10 @@ const DefaultTimeout = 15 * time.Second
 
 // Export is the JSON printed by `watts export --json`: the samples with
 // From < ts <= To, the daily aggregates of the local days From..To and every
-// toggle before To, plus the DDC display readings with From < ts <= To
-// (S19). Displays is omitted when empty and was added within version 1, so
-// an older reader ignores it and an older export decodes with none.
+// toggle before To, plus the DDC display readings (S19) and the network
+// readings (S20) with From < ts <= To. Displays and Network are omitted when
+// empty and were added within version 1, so an older reader ignores them
+// and an older export decodes with none.
 type Export struct {
 	Version  int                    `json:"version"`
 	From     time.Time              `json:"from"`
@@ -49,6 +50,7 @@ type Export struct {
 	Daily    []store.DailyAggregate `json:"daily"`
 	Toggles  []store.Toggle         `json:"toggles"`
 	Displays []store.Display        `json:"displays,omitempty"`
+	Network  []store.NetworkReading `json:"network,omitempty"`
 }
 
 // Build exports the local store for (from, to].
@@ -69,6 +71,9 @@ func Build(st *store.Store, from, to time.Time) (Export, error) {
 	}
 	e.Daily = append(e.Daily, as...)
 	if e.Displays, err = st.Displays("", from, to); err != nil {
+		return Export{}, fmt.Errorf("export: %w", err)
+	}
+	if e.Network, err = st.NetworkReadings("", from, to); err != nil {
 		return Export{}, fmt.Errorf("export: %w", err)
 	}
 	ts, err := st.Toggles(to)
@@ -199,7 +204,7 @@ func firstLine(b []byte) string {
 
 // Merge adds e to d. Remote rows win over local rows with the same key:
 // (source, ts) for samples and displays, (day, source) for aggregates,
-// (item, ts) for toggles. Lists stay sorted by time.
+// (item, ts) for toggles and network readings. Lists stay sorted by time.
 func Merge(d *store.Data, e Export) {
 	if d.Samples == nil {
 		d.Samples = map[string][]store.Sample{}
@@ -221,6 +226,12 @@ func Merge(d *store.Data, e Export) {
 	}
 	if len(e.Displays) > 0 {
 		d.Displays = mergeDisplays(d.Displays, e.Displays)
+	}
+	if len(e.Network) > 0 && d.Network == nil {
+		d.Network = map[string][]store.NetworkReading{}
+	}
+	for item, xs := range group(e.Network, func(x store.NetworkReading) string { return x.Item }) {
+		d.Network[item] = union(d.Network[item], xs, func(x store.NetworkReading) int64 { return x.TS.Unix() })
 	}
 }
 

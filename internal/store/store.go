@@ -1,8 +1,9 @@
 // Package store is the local SQLite store (pure Go, no cgo) in the data dir
 // (config.StorePath). It holds raw power samples written by the daemon,
 // daily aggregates imported from the old consumo ledgers (S12) and manual
-// item toggle events, and the monitor's DDC readings (S19). Estimated items are not stored; package energy derives
-// them at read time (S7).
+// item toggle events, the monitor's DDC readings (S19) and the power-state
+// queries of network items (S20). Estimated items are not stored; package
+// energy derives them at read time (S7).
 package store
 
 import (
@@ -63,13 +64,14 @@ type Toggle struct {
 }
 
 // Data is everything energy needs for a time window, keyed by source
-// (Samples, Daily) or item name (Toggles), each sorted by time. Displays
-// holds every source, sorted by time then source.
+// (Samples, Daily) or item name (Toggles, Network), each sorted by time.
+// Displays holds every source, sorted by time then source.
 type Data struct {
 	Samples  map[string][]Sample
 	Daily    map[string][]DailyAggregate
 	Toggles  map[string][]Toggle
 	Displays []Display
+	Network  map[string][]NetworkReading
 }
 
 // Store is an open database.
@@ -125,7 +127,7 @@ func Open(path string) (*Store, error) {
 	if err != nil {
 		return nil, fmt.Errorf("store %s: %w", path, err)
 	}
-	if _, err := db.Exec(schema); err != nil {
+	if _, err := db.Exec(schema + networkSchema); err != nil {
 		db.Close()
 		return nil, fmt.Errorf("store %s: %w", path, err)
 	}
@@ -339,9 +341,9 @@ func (s *Store) Toggles(before time.Time) (map[string][]Toggle, error) {
 // Load returns the data energy needs for [from, to): samples with
 // from < ts <= to+margin (pass 3 × the sample interval so samples covering
 // the window edge are included), aggregates for the local days touching the
-// window, all toggles before to (state carries over from earlier ones) and
-// display readings with from − margin < ts <= to (a reading covers time
-// after it, so one just before from reaches into the window).
+// window, all toggles before to (state carries over from earlier ones), and
+// display and network readings with from − margin < ts <= to (a reading
+// covers time after it, so one just before from reaches into the window).
 func (s *Store) Load(from, to time.Time, margin time.Duration) (Data, error) {
 	d := Data{Samples: map[string][]Sample{}, Daily: map[string][]DailyAggregate{}}
 	xs, err := s.Samples("", from, to.Add(margin))
@@ -363,6 +365,16 @@ func (s *Store) Load(from, to time.Time, margin time.Duration) (Data, error) {
 	}
 	if d.Displays, err = s.Displays("", from.Add(-margin), to); err != nil {
 		return Data{}, err
+	}
+	ns, err := s.NetworkReadings("", from.Add(-margin), to)
+	if err != nil {
+		return Data{}, err
+	}
+	for _, x := range ns {
+		if d.Network == nil {
+			d.Network = map[string][]NetworkReading{}
+		}
+		d.Network[x.Item] = append(d.Network[x.Item], x)
 	}
 	return d, nil
 }
