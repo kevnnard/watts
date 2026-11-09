@@ -8,6 +8,9 @@
 // With a Display reader (the Linux monitor over DDC, S19), each tick also
 // stores one display row. A failed DDC read stores no row for that tick and
 // does not affect the power sample.
+//
+// With Network, each tick also asks the network items for their power state
+// in the background and stores one reading per item (network.go).
 package daemon
 
 import (
@@ -15,6 +18,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strings"
 	"time"
 
 	"github.com/kevnnard/watts/internal/sensor"
@@ -26,6 +30,7 @@ type Store interface {
 	AddSample(store.Sample) error
 	AddDisplay(store.Display) error
 	LatestSample(source string) (store.Sample, bool, error)
+	AddNetwork([]store.NetworkReading) error
 }
 
 // Display reads the monitor (sensor.DDC).
@@ -42,6 +47,9 @@ type Daemon struct {
 	// Display, when set, is read on every tick into a display row of the
 	// sensor's source. nil means no DDC.
 	Display Display
+	// Network, when set, is polled at start and on every tick. nil means
+	// no network items.
+	Network *Network
 	// Tick returns a channel that fires every interval and a stop func;
 	// nil means a time.Ticker.
 	Tick func(time.Duration) (<-chan time.Time, func())
@@ -75,14 +83,30 @@ func (d *Daemon) Run(ctx context.Context) error {
 		last = s.TS
 	}
 	ddcFailing := false
+	var net *poller
+	if d.Network != nil && len(d.Network.Items) > 0 {
+		names := make([]string, len(d.Network.Items))
+		for i, it := range d.Network.Items {
+			names[i] = it.Name
+		}
+		fmt.Fprintf(log, "watts daemon: asking %s for its power state every %v (estimated, not measured)\n", strings.Join(names, ", "), d.Interval)
+		net = newPoller(d.Network, d.Store, log)
+		net.start(ctx)
+	}
 	tick, stop := d.ticker()
 	defer stop()
 	for {
 		select {
 		case <-ctx.Done():
+			if net != nil {
+				net.wait()
+			}
 			fmt.Fprintln(log, "watts daemon: stopped")
 			return nil
 		case <-tick:
+		}
+		if net != nil {
+			net.start(ctx)
 		}
 		if ts, ok := d.sample(ctx, log, src, last); ok {
 			last = ts

@@ -479,3 +479,70 @@ func TestStablePath(t *testing.T) {
 		}
 	}
 }
+
+// The daemon asks only the network items of its own source, and stores
+// their readings; the items of the other machine are left to its daemon.
+func TestDaemonNetworkItems(t *testing.T) {
+	dbPath := isolate(t)
+	cfg := config.Default()
+	cfg.Items = append(cfg.Items,
+		config.Item{Name: "TV", Mode: config.ModeNetwork, Source: config.SourceMac, Probe: config.ProbeSamsung,
+			Host: "192.0.2.16", ID: "uuid:abc", Watts: 63, StandbyW: 0.5, Quantity: 1},
+		config.Item{Name: "PS5", Mode: config.ModeNetwork, Source: config.SourceLinux, Probe: config.ProbePS5,
+			Host: "192.0.2.40", Watts: 217, StandbyW: 1.2, Quantity: 1})
+	if err := config.Save(config.Path(), cfg); err != nil {
+		t.Fatal(err)
+	}
+	polled := make(chan struct{}, 10)
+	var asked []string
+	old := localNetwork
+	localNetwork = func(items []config.Item) *daemon.Network {
+		n := old(items)
+		n.Scan = nil
+		n.Query = func(_ context.Context, tg sensor.NetworkTarget) (sensor.NetworkObservation, error) {
+			defer func() { polled <- struct{}{} }()
+			asked = append(asked, tg.Host+" "+tg.ID)
+			return sensor.NetworkObservation{At: now(), State: "on", Host: tg.Host, ID: tg.ID, Verified: true}, nil
+		}
+		return n
+	}
+	t.Cleanup(func() { localNetwork = old })
+	useSensor(t, &fakeSensor{r: sensor.Reading{Source: "mac", Watts: 24.2, At: time.Now()}}, nil)
+	done := make(chan string)
+	go func() {
+		_, _, e := runArgs("daemon")
+		done <- e
+	}()
+	select {
+	case <-polled:
+	case <-time.After(5 * time.Second):
+		t.Fatal("no network poll")
+	}
+	if err := syscall.Kill(os.Getpid(), syscall.SIGTERM); err != nil {
+		t.Fatal(err)
+	}
+	var errOut string
+	select {
+	case errOut = <-done:
+	case <-time.After(5 * time.Second):
+		t.Fatal("daemon did not stop")
+	}
+	want := "watts daemon: store " + dbPath + "\nwatts daemon: mac 24.2 W now, sampling every 1m0s\n" +
+		"watts daemon: asking TV for its power state every 1m0s (estimated, not measured)\n" +
+		"watts daemon: TV on at 192.0.2.16\nwatts daemon: stopped\n"
+	if errOut != want {
+		t.Errorf("stderr =\n%q\nwant\n%q", errOut, want)
+	}
+	if !reflect.DeepEqual(asked, []string{"192.0.2.16 uuid:abc"}) {
+		t.Errorf("asked %q, want only the mac's TV", asked)
+	}
+	st, err := store.Open(dbPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer st.Close()
+	rows, _ := st.NetworkReadings("", time.Time{}, time.Now().Add(time.Hour))
+	if len(rows) != 1 || rows[0].Item != "TV" || rows[0].State != store.NetworkOn || !rows[0].Verified {
+		t.Errorf("rows = %+v", rows)
+	}
+}

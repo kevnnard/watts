@@ -151,8 +151,9 @@ func TestRunRejectsBadConfig(t *testing.T) {
 
 type nopStore struct{}
 
-func (nopStore) AddSample(store.Sample) error   { return nil }
-func (nopStore) AddDisplay(store.Display) error { return nil }
+func (nopStore) AddSample(store.Sample) error            { return nil }
+func (nopStore) AddDisplay(store.Display) error          { return nil }
+func (nopStore) AddNetwork([]store.NetworkReading) error { return nil }
 func (nopStore) LatestSample(string) (store.Sample, bool, error) {
 	return store.Sample{}, false, nil
 }

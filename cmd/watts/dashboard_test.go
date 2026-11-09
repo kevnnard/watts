@@ -317,6 +317,18 @@ func TestRemoteLoader(t *testing.T) {
 		if c := defaultRemoteClient(noPC); c != nil {
 			t.Errorf("client without a linux item = %+v", c)
 		}
+		// The Linux daemon asks the network items of source linux, so the
+		// Mac reads their states from it.
+		tvOnPC := config.Default()
+		tvOnPC.Items = append(tvOnPC.Items[:1], config.Item{Name: "TV", Mode: config.ModeNetwork, Source: config.SourceLinux,
+			Probe: config.ProbeSamsung, Host: "192.0.2.16", Watts: 63, StandbyW: 0.5, Quantity: 1})
+		if c := defaultRemoteClient(tvOnPC); c == nil {
+			t.Error("no client for a linux network item")
+		}
+		tvOnPC.Items[1].Source = config.SourceMac
+		if c := defaultRemoteClient(tvOnPC); c != nil {
+			t.Errorf("client for a mac network item = %+v", c)
+		}
 	})
 }
 

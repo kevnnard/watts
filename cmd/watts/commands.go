@@ -19,6 +19,7 @@ import (
 
 	"github.com/kevnnard/watts/internal/config"
 	"github.com/kevnnard/watts/internal/daemon"
+	"github.com/kevnnard/watts/internal/discover"
 	"github.com/kevnnard/watts/internal/importer"
 	"github.com/kevnnard/watts/internal/install"
 	"github.com/kevnnard/watts/internal/remote"
@@ -30,6 +31,7 @@ import (
 var (
 	localSensor  = sensor.Local
 	localDisplay = ddcDisplay
+	localNetwork = netNetwork
 	now          = time.Now
 	goos         = runtime.GOOS
 	executable   = stableExecutable
@@ -215,6 +217,9 @@ func runDaemon(args []string, stdout, stderr io.Writer) int {
 		fmt.Fprintf(stderr, "watts daemon: %s\n", note)
 	}
 	d.Display = disp
+	if items := networkItems(cfg, s.Source()); len(items) > 0 {
+		d.Network = localNetwork(items)
+	}
 	if err := d.Run(ctx); err != nil {
 		fmt.Fprintf(stderr, "watts daemon: %v\n", err)
 		return 1
@@ -231,6 +236,29 @@ func ddcDisplay(ctx context.Context, cfg *config.Config) (daemon.Display, string
 		return nil, off
 	}
 	return d, fmt.Sprintf("DDC on /dev/i2c-%d", d.Bus)
+}
+
+// networkItems are the network items the daemon of source asks: each
+// item's source names the one machine that polls it.
+func networkItems(cfg *config.Config, source string) []config.Item {
+	var out []config.Item
+	for _, it := range cfg.Items {
+		if it.Mode == config.ModeNetwork && it.Source == source {
+			out = append(out, it)
+		}
+	}
+	return out
+}
+
+// netNetwork asks the items over the real network (S20).
+func netNetwork(items []config.Item) *daemon.Network {
+	return &daemon.Network{
+		Items: items,
+		Query: func(ctx context.Context, t sensor.NetworkTarget) (sensor.NetworkObservation, error) {
+			return sensor.QueryNetwork(ctx, t, sensor.NetworkOptions{})
+		},
+		Scan: func(ctx context.Context) ([]discover.Device, error) { return discover.Scan(ctx, discover.Options{}) },
+	}
 }
 
 // parseTime accepts RFC3339 or YYYY-MM-DD (local midnight).

@@ -32,13 +32,14 @@ var (
 )
 
 // defaultRemoteClient reads the Linux PC over SSH from the Mac, when the
-// config measures one. Elsewhere the store is the only source.
+// config measures one or has network items the Linux daemon asks.
+// Elsewhere the store is the only source.
 func defaultRemoteClient(cfg *config.Config) *remote.Client {
 	if goos != "darwin" {
 		return nil
 	}
 	for _, it := range cfg.Items {
-		if it.Mode == config.ModeMeasured && it.Source == config.SourceLinux {
+		if (it.Mode == config.ModeMeasured || it.Mode == config.ModeNetwork) && it.Source == config.SourceLinux {
 			return remote.FromConfig(cfg)
 		}
 	}
